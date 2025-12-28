@@ -1,0 +1,8 @@
+#+options: toc:nil
+#+startup: showall
+
+* Linux
+
+#+begin_quote
+Everything regarding my favourite and free operating system
+#+end_quote

@@ -1,0 +1,13 @@
+# Hugo
+/public/
+/resources/_gen/
+.hugo_build.lock
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Ignore all themes except hyde
+themes/*
+!themes/hyde/
+!themes/hyde/**

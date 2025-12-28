@@ -1,0 +1,6 @@
+Z:\home\jdyer\Untitled.arscript
+Line: 80252 String: Wait: 2.151s _ EvType: Command  CommandID: ReferencelmageXForm Idx: 0 Lo
+(0234699, 0.577425) Size: (273, 320) Scale: 1 Rot: 0.00952139  Off: (0,0)
+
+o |
+

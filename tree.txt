@@ -1,0 +1,35 @@
+.
+├── config-excl
+├── config-excl_publish
+├── config-incl
+├── config.toml
+├── content
+│   ├── blog
+│   ├── emacs
+│   ├── linux
+│   └── tags
+├── layouts
+│   ├── _default
+│   └── partials
+├── resources
+│   └── _gen
+├── static
+│   ├── assets
+│   ├── css
+│   ├── images
+│   └── ox-hugo
+└── themes
+    ├── beautifulhugo
+    ├── hugo-bootstrap-gallery
+    ├── hugo-clarity
+    ├── Hugo-Octopress
+    ├── hugo-paper
+    ├── hugo-theme-m10c
+    ├── hugo-theme-notrack
+    ├── hugo-xmag
+    ├── hyde
+    ├── lightbi-hugo
+    ├── Mainroad
+    └── risotto
+
+29 directories, 4 files
