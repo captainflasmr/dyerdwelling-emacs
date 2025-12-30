@@ -1,4 +1,4 @@
-baseurl = "https://emacs.dyerdwelling.family/"
+baseurl = "https://www.emacs.dyerdwelling.family/"
 canonifyurls = false
 relativeURL = true
 theme = "hyde"
