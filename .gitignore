@@ -1,0 +1,37 @@
+# Hugo build output
+/public/
+/resources/_gen/
+.hugo_build.lock
+
+# Ignore all content except emacs-related
+content/*
+!content/emacs/
+!content/linux/
+!content/blog/
+content/blog/*
+!content/blog/posts--about-me.md
+!content/tags/
+
+# Ignore all static except emacs-related
+static/*
+!static/emacs/
+!static/css/
+!static/assets/
+!static/images/
+
+# Ignore all themes except hyde
+themes/*
+!themes/hyde/
+
+# Ignore art/dyerdwelling configs
+config/config-art.toml
+config/config-dyerdwelling.toml
+
+# Ignore non-emacs org files
+art.org
+blog.org
+linux.org
+dad-dictionary.org
+
+# Ignore latex
+latex/

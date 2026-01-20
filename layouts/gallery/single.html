@@ -1,0 +1,35 @@
+{{ define "main" }}
+<script src="https://cdn.jsdelivr.net/npm/masonry-layout@4.2.2/dist/masonry.pkgd.min.js" integrity="sha384-GNFwBvfVxBkLMJpYMOABq3c+d3KnQxudP/mGPkzpZSTYykLBNsZEnG2D9G/X/+7D" crossorigin="anonymous" async></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-kenU1KFdBIe4zVF0s0G1M5b4hcpxyD9F7jL+jjXkk+Q2h455rYXK/7HAuoJl+0I4" crossorigin="anonymous"></script>
+
+<div class="container">
+  <div class="row">
+    <div class="col">
+      {{ partial "metas.html" . }}
+      <div class="py-3">{{ .Content | markdownify }}</div>
+    </div>
+  </div>
+  <div class="row row-img-fluid" data-masonry='{"percentPosition": true }'>
+    {{- /* Get the gallery directory from the page path */ -}}
+    {{- $section := .Section -}}
+    {{- $galleryName := path.Base .File.Dir -}}
+    {{- $staticPath := print "static/" $section "/" $galleryName -}}
+    {{- $urlBase := print "/" $section "/" $galleryName -}}
+
+    {{- /* Read images from static directory */ -}}
+    {{- $files := readDir $staticPath -}}
+    {{- range sort $files "Name" "desc" -}}
+      {{- $isImg := lower .Name | findRE "\\.(gif|webp|jpg|jpeg|tiff|png|bmp)" -}}
+      {{- if $isImg -}}
+        {{- $imgPath := print $urlBase "/" .Name -}}
+        <div class="col-6 col-md-3 col-xl-2 pb-1 px-2">
+          <a href="{{ $imgPath }}">
+            <img src="{{ $imgPath }}" alt="Gallery Image" class="img-fluid">
+          </a>
+        </div>
+      {{- end -}}
+    {{- end -}}
+  </div>
+</div>
+</section>
+{{ end }}

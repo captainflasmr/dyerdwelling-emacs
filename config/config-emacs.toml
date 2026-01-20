@@ -1,0 +1,152 @@
+# Emacs site configuration
+baseurl = "https://www.emacs.dyerdwelling.family/"
+canonifyurls = false
+relativeURL = true
+theme = "hyde"
+DefaultContentLanguage = "en"
+title="Emacs@ Dyerdwelling"
+
+[pagination]
+  disableAliases = false
+  pagerSize = 24
+  path = 'page'
+
+[Services.Disqus]
+  Shortname = "https-www-emacs-dyerdwelling-family"
+
+[languages.en.params]
+  BookTheme = 'light'
+  BookToC = true
+  mainSections = ["emacs", "linux"]
+  contentTypeName = ["emacs", "linux"]
+  title = "DyerDwelling Emacs"
+  siteHeading = "DyerDwelling Emacs"
+  copyright = "© 2025 James Dyer all rights reserved"
+  post_meta = ["author", "date", "categories"] # Order of post meta information
+  readmore = true
+  thumbnail_hide_post = true
+  custom_css = ["assets/css/bootstrap.css", "assets/css/style.css"]
+  customCSS = ["assets/css/bootstrap.css", "assets/css/style.css"]
+  site_logo = "/images/banner/Emacs-rictus.jpg"
+  navbar_background = "/images/banner/navbar-emacs.jpg"
+  footer = "© 2025 James Dyer all rights reserved"
+  showBlogLatest = true
+  blogLatestHeading = "My Emacs Blog"
+  avatarURL = "/images/banner/Banner_emacs.png"
+  description = "Journeying through the Emacs rabbit hole"
+
+[languages.en.params.author]
+  name = "James Dyer"
+  email = "captainflasmr@gmail.com"
+
+[languages.en.params.style]
+   darkestColor = "#242930"
+   darkColor = "#353b43"
+   lightColor = "#C7D2DC"
+   lightestColor = "#ffffff"
+   primaryColor = "#F46F6B"
+
+[[languages.en.params.social]]
+    icon = "github"
+    name = "Github"
+    url = "https://github.com/captainflasmr"
+
+[params.logo]
+  subtitle = "by James Dyer"
+
+[[menu.main]]
+  name = "dired"
+  url = "/tags/dired/"
+  weight = 50
+
+[[menu.main]]
+  name = "elisp"
+  url = "/tags/elisp/"
+  weight = 70
+
+[[menu.main]]
+  name = "org"
+  url = "/tags/org/"
+  weight = 90
+
+[[menu.main]]
+  name = "hugo"
+  url = "/tags/hugo/"
+  weight = 99
+
+[[menu.main]]
+  name = "about"
+  url = "/blog/posts--about-me/"
+  identifier = "About"
+  weight = 110
+
+[[menu.main]]
+  name = "index"
+  url = "/tags/"
+  weight = 120
+
+[taxonomies]
+tag = "tags"
+category = "categories"
+
+[thumbnail]
+visibility = false
+
+[markup]
+[markup.goldmark]
+[markup.goldmark.renderer]
+hardWraps = false
+unsafe = true
+xhtml = false
+
+# note these are required to get the menu direct page links to work
+[permalinks]
+page = "/:slug/"
+posts = "/:slug/"
+notes = "/:slug/"
+
+[outputs]
+home = ["HTML", "RSS", "htaccess", "JSON"]
+
+[outputFormats]
+[outputFormats.htaccess]
+baseName = ""
+isPlainText = true
+mediaType = "text/htaccess"
+
+[mediaTypes]
+[mediaTypes."text/htaccess"]
+suffixes = ["htaccess"]
+
+[Params.sidebar]
+home = "right"   # Configure layout for home page
+list = "right"   # Configure layout for list pages
+single = "right" # Configure layout for single pages
+# Enable widgets in given order
+widgets = ["ddg-search", "recent", "categories", "taglist"]
+
+[Params.widgets]
+recent_num = 5 # Set the number of articles in the "Recent articles" widget
+tags_counter = false # Enable counter for each tag in "Tags" widget (disabled by default)
+categories_counter = true
+
+# Module mounts for emacs-specific content
+[module]
+  [[module.mounts]]
+    source = "content/emacs"
+    target = "content/emacs"
+  [[module.mounts]]
+    source = "content/linux"
+    target = "content/linux"
+  [[module.mounts]]
+    source = "content/blog"
+    target = "content/blog"
+  [[module.mounts]]
+    source = "content/tags"
+    target = "content/tags"
+  [[module.mounts]]
+    source = "static"
+    target = "static"
+  [[module.mounts]]
+    source = "layouts"
+    target = "layouts"

@@ -1,0 +1,501 @@
+---
+title: "Bank Buddy - Your Financial Analysis Companion for Emacs!"
+author: ["James Dyer"]
+lastmod: 2025-05-28T08:50:00+01:00
+tags: ["emacs", "bank-buddy", 2025]
+categories: ["emacs", "linux"]
+draft: false
+thumbnail: "/emacs/20250528081648-emacs--Your-Financial-Analysis-Companion-for-Emacs.jpg"
+---
+
+I created a new package!, here are the details:
+
+Bank Buddy is an Emacs package that provides financial analysis and reporting capabilities for your bank statements. It processes CSV bank statement data, categorizes transactions using customizable patterns, and generates detailed reports in Org-mode format.
+
+<!--more-->
+
+{{< figure src="/emacs/20250528081648-emacs--Your-Financial-Analysis-Companion-for-Emacs.jpg" width="100%" >}}
+
+It does not depend on any external account system, and the analysis is handled by `elisp`. The only external tool that may be required is `gnuplot` to visualize the generated data.
+
+Here is an example of the type of report that is generated (obviously using test data :))
+
+<https://github.com/captainflasmr/bank-buddy/blob/main/tests/bank-statement_report/bank-statement_report.org>
+
+See <https://github.com/captainflasmr/bank-buddy/blob/main/docs/bank-buddy.org> for the manual!
+
+
+## Key Features {#key-features}
+
+-   **Smart Transaction Categorization**: Auto-categorizes transactions based on customizable regex patterns
+-   **Financial Reports**: Generates detailed reports in Org-mode with:
+    -   Transaction summaries and overviews
+    -   Spending category analysis
+    -   Top merchant identification
+    -   Monthly spending patterns with visual representation
+    -   Recurring subscription detection
+-   **Interactive Category Management**: Edit and refine categorization patterns directly from reports
+-   **Data Visualizations**: Generates charts and graphs using external gnuplot scripts
+-   **No Reliance on External Accounting System** - Analysis is all Emacs built-in
+-   **Asynchronous Processing**: Efficiently handles large bank statements without blocking Emacs
+
+
+## Screenshots {#screenshots}
+
+
+### Monthly Spending categories {#monthly-spending-categories}
+
+{{< figure src="/emacs/financial-report--monthly-spending-categories.png" width="100%" >}}
+
+
+### Monthly Spending categories (stacked) {#monthly-spending-categories--stacked}
+
+{{< figure src="/emacs/financial-report--monthly-spending-stacked.png" width="100%" >}}
+
+
+## Quick Start {#quick-start}
+
+1.  Export your bank statement as a CSV file
+2.  Edit CSV using `csv-mode` for all lines to the format DATE,DESCRIPTION,AMOUNT
+3.  Open CSV file
+4.  Run: `M-x bank-buddy-generate`
+5.  Open the generated report
+
+
+## Generate gnuplots {#generate-gnuplots}
+
+Since version 0.2.0, Bank Buddy generates external gnuplot scripts that are executed via `call-process`. You need to have gnuplot installed on your system.
+
+To install gnuplot:
+
+-   Linux: `sudo apt install gnuplot` (or equivalent for your distribution)
+-   macOS: `brew install gnuplot`
+-   Windows: Download from <http://www.gnuplot.info/>
+
+The generated reports will include links to both the gnuplot script files (.gp) and data files (.dat) for each visualization. This allows for:
+
+-   Easy customization of plots by editing the gnuplot scripts
+-   Regeneration of plots without reprocessing the CSV data
+-   Better control over visualization settings
+
+
+## Usage Guide {#usage-guide}
+
+
+### Understanding CSV Format {#understanding-csv-format}
+
+Bank Buddy expects CSV files with at least the following columns:
+
+-   Transaction date
+-   Transaction description
+-   Debit amount
+
+Different banks format their CSV exports differently. You may need to preprocess your CSV to match this format, I would advise to use the package `csv-mode`, open up a csv file and `C-c C-k` you way to removed unwanted columns so all you have left are those described above.
+
+
+### Example CSV {#example-csv}
+
+```csv
+Date,Description,Amount
+2024-06-30,PAYPAL TRANSFER,28.50
+2024-06-28,JUST-EAT TAKEAWAY,32.99
+2024-06-25,ASDA GROCERIES,78.50
+2024-06-22,AUDIBLE SUBSCRIPTION,7.99
+2024-06-20,THREE MOBILE,25.00
+2024-06-18,RIVER-ISLAND CLOTHES,85.99
+2024-06-15,SPOTIFY PREMIUM,9.99
+2024-06-12,RAILWAY TICKET,42.00
+2024-06-10,AMAZON PURCHASE,55.25
+2024-06-07,NETFLIX SUBSCRIPTION,13.99
+2024-06-05,VIRGIN-MEDIA MONTHLY,65.50
+2024-06-03,NOTEMACHINE WITHDRAWAL,100.00
+2024-06-01,KATHERINE ALLOWANCE,200.00
+2024-05-30,DENTIST APPOINTMENT,60.00
+2024-05-28,SKY-BETTING RACES,25.00
+2024-05-25,WAITROSE GROCERIES,115.45
+2024-05-22,NOWTV SUBSCRIPTION,9.99
+2024-05-20,PAYPAL TRANSFER,40.00
+2024-05-18,THREE MOBILE,25.00
+2024-05-15,UBER RIDE,18.25
+2024-05-12,SAINSBURYS GROCERIES,105.75
+2024-05-10,AMAZON PURCHASE,32.99
+2024-05-07,NETFLIX SUBSCRIPTION,13.99
+2024-05-05,VIRGIN-MEDIA MONTHLY,65.50
+2024-05-02,KATHERINE ALLOWANCE,200.00
+2024-04-30,DELIVEROO FOOD,25.50
+2024-04-28,PRIME VIDEO RENTAL,4.99
+2024-04-25,PETS AT HOME,45.00
+2024-04-23,RAILWAY TICKET,18.50
+2024-04-20,YOUTUBE PREMIUM,11.99
+2024-04-18,IKEA FURNITURE,245.99
+2024-04-15,TESCO GROCERIES,68.95
+2024-04-12,STARBUCKS COFFEE,9.85
+2024-04-10,AMAZON PURCHASE,78.50
+2024-04-07,NETFLIX SUBSCRIPTION,13.99
+2024-04-05,CLAUDE SUBSCRIPTION,20.00
+2024-04-03,VIRGIN-MEDIA MONTHLY,65.50
+2024-04-01,KATHERINE ALLOWANCE,200.00
+2024-03-30,PAYPAL TRANSFER,45.00
+2024-03-28,BET365 RACES,30.00
+2024-03-25,UBER RIDE,15.75
+2024-03-22,WITHDRAWAL ATM,50.00
+2024-03-20,THREE MOBILE,25.00
+2024-03-17,SAINSBURYS GROCERIES,95.25
+2024-03-15,SPECSAVERS APPOINTMENT,25.00
+2024-03-12,RAILWAY TICKET,22.50
+2024-03-10,AMAZON PURCHASE,28.99
+2024-03-07,NETFLIX SUBSCRIPTION,13.99
+2024-03-05,NATWEST-BANK-REFERENCE RENT,750.00
+2024-03-03,NEXT RETAIL-LTD,125.00
+2024-03-01,VIRGIN-MEDIA MONTHLY,65.50
+2024-02-28,YOUTUBE PREMIUM,11.99
+2024-02-25,SKY SUBSCRIPTION,45.99
+2024-02-23,ASDA GROCERIES,92.45
+2024-02-20,DISNEY+ SUBSCRIPTION,7.99
+2024-02-18,PAYPAL TRANSFER,35.99
+2024-02-15,TESCO GROCERIES,75.40
+2024-02-12,WATERSTONES BOOK,15.99
+2024-02-10,AMAZON PURCHASE,65.75
+2024-02-07,NETFLIX SUBSCRIPTION,13.99
+2024-02-05,ROYAL-MAIL POSTAGE,8.95
+2024-02-03,RAILWAY TICKET,35.45
+2024-02-01,KATHERINE ALLOWANCE,200.00
+2024-01-30,UBER RIDE,12.50
+2024-01-28,STARBUCKS COFFEE,4.95
+2024-01-25,THREE MOBILE,25.00
+2024-01-20,AMAZON PURCHASE,45.30
+2024-01-18,SAINSBURYS GROCERIES,88.75
+2024-01-15,NETFLIX SUBSCRIPTION,13.99
+2024-01-12,PAYPAL TRANSFER,22.45
+2024-01-10,VIRGIN-MEDIA MONTHLY,65.50
+2024-01-07,SKY-BETTING RACES,20.00
+2024-01-05,PAYPAL TRANSFER,55.99
+```
+
+
+### Generating a Report {#generating-a-report}
+
+To generate a financial report `M-x bank-buddy-generate-report`
+
+You'll be prompted to select an input CSV file and specify the output Org file.
+
+The package processes the data asynchronously and a buffer will appear reporting on the analysis progress, so Emacs remains responsive even with large CSV files.
+
+When processing is complete, you'll be asked if you want to open the generated report.
+
+
+### Understanding the Report {#understanding-the-report}
+
+A typical Bank Buddy report includes:
+
+
+#### Summary Overview {#summary-overview}
+
+-   Total transactions analyzed
+-   Date range
+-   Total, average daily, and weekly spending
+
+
+#### Top Spending Categories {#top-spending-categories}
+
+-   Ranked list of spending categories
+-   Total amount, percentage, and monthly/yearly averages
+-   Links to generated gnuplot scripts and data files
+
+
+#### Monthly Spending Patterns {#monthly-spending-patterns}
+
+-   Month-by-month spending visualization
+-   Category breakdown for each month
+-   Highest and lowest spending months
+-   Links to visualization files (\*.gp, \*.dat)
+
+
+#### Monthly Category Breakdowns {#monthly-category-breakdowns}
+
+-   Detailed charts for each month showing spending by category
+-   Consistent color coding across months for easy comparison
+-   Links to individual gnuplot scripts for customization
+
+
+#### Top Merchants {#top-merchants}
+
+-   Your highest-spending merchants
+-   Total amount, percentage, and monthly/yearly averages
+-   Links to generated visualization files
+
+
+#### Recurring Subscriptions {#recurring-subscriptions}
+
+-   Detected recurring payments
+-   Estimated monthly cost
+-   Frequency analysis (weekly, bi-weekly, monthly, annual)
+
+
+#### Transaction Size Distribution {#transaction-size-distribution}
+
+-   Analysis of transaction sizes (under £10, £10-50, £50-100, over £100)
+
+
+#### Unmatched Transactions {#unmatched-transactions}
+
+-   List of transactions that didn't match specific categories
+-   Suggested patterns to add to your customization
+
+
+### Managing Transaction Categories {#managing-transaction-categories}
+
+Bank Buddy comes with predefined category patterns, but you'll likely want to customize these for your personal transactions. The package includes an interactive mode for managing categories.
+
+When viewing a report, you can:
+
+1.  Navigate to an unmatched transaction (in the "Unmatched Transactions" section)
+2.  Press `C-c C-a` to add it to a category
+3.  Choose an existing category or create a new one
+4.  Optionally save the updated category definitions to your init file
+5.  Regenerate the report to see the changes
+
+To manage existing categories or add new ones manually, customize `bank-buddy-core-cat-list-defines`.
+
+
+### Category Format {#category-format}
+
+Categories are defined as patterns in the form:
+
+```elisp
+(REGEX-PATTERN CATEGORY-CODE)
+```
+
+Where:
+
+-   `REGEX-PATTERN` is a regular expression that matches transaction descriptions
+-   `CATEGORY-CODE` is a short code representing the category (e.g., "fod" for food)
+
+For example:
+
+```elisp
+("amazon\\|amz" "amz")  ; Amazon purchases
+("netflix\\|spotify\\|youtube" "str")  ; Streaming services
+```
+
+You can customize category codes and their display names by modifying `bank-buddy-core-category-names`.
+
+
+### Updating and Regenerating Reports {#updating-and-regenerating-reports}
+
+If you add or modify category patterns after generating a report:
+
+1.  With the report open, enable Bank Buddy Category mode if not already active: `M-x bank-buddy-cat-mode`
+2.  Press `C-c C-r` to regenerate the report with the updated categories
+
+The report will be refreshed with the new categorization rules.
+
+
+## Example Workflow {#example-workflow}
+
+-   **Generate Initial Report** `M-x bank-buddy-generate-report`
+
+-   **Review Unmatched Transactions**
+    Navigate to the "Unmatched Transactions" section of the report.
+
+-   **Categorize Transactions**
+    -   Place cursor on an unmatched transaction
+    -   `C-c C-a` to add it to a category
+    -   Choose an existing category or create a new one
+
+-   **Regenerate Report**
+    -   `C-c C-r` to see your changes
+
+-   **Save Category Definitions**
+    When prompted, choose to save your category definitions to your init file.
+
+
+## Customization {#customization}
+
+
+### Core Settings {#core-settings}
+
+```elisp
+;; Exclude large transactions from analysis
+(setq bank-buddy-core-exclude-large-txns t)
+(setq bank-buddy-core-large-txn-threshold 2000)
+
+;; Number of occurrences to detect subscriptions
+(setq bank-buddy-core-subscription-min-occurrences 3)
+
+;; Number of top items to display
+(setq bank-buddy-core-top-spending-categories 5)
+(setq bank-buddy-core-top-merchants 5)
+```
+
+
+### Customizing Category Patterns {#customizing-category-patterns}
+
+You can customize the category patterns by setting `bank-buddy-core-cat-list-defines`:
+
+```elisp
+(customize-set-variable 'bank-buddy-core-cat-list-defines
+  '(("amazon\\|amz" "amz")
+    ("netflix\\|spotify" "str")
+    ("uber\\|lyft" "txi")
+    ("sainsburys\\|tesco\\|asda" "fod")
+    ;; Add your own patterns here
+    (".*" "o")))  ; Catch-all pattern should be last
+```
+
+
+### Customizing Category Names {#customizing-category-names}
+
+Category codes are mapped to human-readable names via `bank-buddy-core-category-names`:
+
+```elisp
+(customize-set-variable 'bank-buddy-core-category-names
+  '(("amz" . "Amazon")
+    ("str" . "Streaming Services")
+    ("txi" . "Taxi & Rideshare")
+    ("fod" . "Groceries")
+    ;; Add your own mappings here
+    ("o" . "Other")))
+```
+
+
+### Customizing Subscription Detection {#customizing-subscription-detection}
+
+Define subscription patterns for better detection of recurring payments:
+
+```elisp
+(customize-set-variable 'bank-buddy-core-subscription-patterns
+  '(("NETFLIX" . "Netflix")
+    ("SPOTIFY" . "Spotify")
+    ("AMAZON PRIME" . "Amazon Prime")
+    ;; Add your own patterns here
+    ))
+```
+
+
+## Advanced Usage {#advanced-usage}
+
+
+### Integration with Other Financial Tools {#integration-with-other-financial-tools}
+
+Bank Buddy reports are generated as Org-mode files, making them compatible with other Org-based tools:
+
+-   Export to HTML, PDF, or other formats with Org export functions
+-   Use `org-capture` to add notes to specific transactions or categories
+
+
+### Custom Visualization {#custom-visualization}
+
+Bank Buddy generates visualizations using external gnuplot scripts. You can customize these by:
+
+1.  Editing the generated .gp files in the report directory
+2.  Creating your own gnuplot scripts based on the generated .dat files
+3.  Running the scripts manually with `gnuplot filename.gp`
+
+
+### Keyboard Shortcuts {#keyboard-shortcuts}
+
+When viewing a report with `bank-buddy-cat-mode` enabled:
+
+-   `C-c C-a`: Add the transaction at point to a category
+-   `C-c C-r`: Regenerate the report with current category definitions
+
+
+## Caveats and Tips {#caveats-and-tips}
+
+-   **CSV Format**: Bank Buddy expects a CSV with date, description, and amount columns
+-   **Performance**: For very large CSV files (10K+ rows), the async processing helps but may still take time
+-   **Categorization**: Start with broad patterns and refine as needed
+-   **Visualization**: Ensure gnuplot is installed on your system for chart generation
+-   **Saving Patterns**: Always save your category patterns to persist between sessions
+
+
+## Comparison with Other Financial Packages {#comparison-with-other-financial-packages}
+
+Several Emacs packages exist for financial management, but they serve different purposes. Here's how Bank Buddy compares to other notable financial packages:
+
+
+### Ledger-mode {#ledger-mode}
+
+[Ledger-mode](https://github.com/ledger/ledger-mode) is an Emacs interface to the command-line Ledger accounting system.
+
+**Key differences:**
+
+-   Ledger is a complete double-entry accounting system; Bank Buddy is focused on bank statement analysis
+-   Ledger requires manual transaction entry or carefully formatted imports; Bank Buddy automates categorization
+-   Ledger offers more comprehensive accounting features (accounts, assets, liabilities); Bank Buddy focuses on spending insights
+-   Bank Buddy provides visual spending breakdowns and charts; Ledger focuses on accurate accounting
+
+**When to use Ledger:** For complete personal finance tracking, investments, budgeting, and double-entry accounting.
+**When to use Bank Buddy:** For quick analysis of bank statements and visualizing spending patterns.
+
+
+### HLedger-mode {#hledger-mode}
+
+[HLedger-mode](https://github.com/narendraj9/hledger-mode) is an Emacs major mode for working with hledger, a plain-text accounting system similar to Ledger.
+
+**Key differences:**
+
+-   HLedger, like Ledger, is a full double-entry accounting system; Bank Buddy focuses on bank statement analysis
+-   HLedger requires manual transaction entry or formatted imports; Bank Buddy automates categorization
+-   HLedger offers comprehensive accounting features (multiple currencies, time reporting); Bank Buddy emphasizes spending insights
+-   Bank Buddy provides visual spending breakdowns; HLedger focuses on textual reports and balances
+
+**When to use HLedger-mode:** For detailed personal finance tracking, multi-currency support, and generating various financial reports.
+**When to use Bank Buddy:** For quick analysis of bank statements and visualizing spending patterns without learning a full accounting system.
+
+
+### Elbank {#elbank}
+
+[Elbank](https://github.com/NicolasPetton/Elbank) is a personal finance reporting tool for Emacs that uses Weboob to fetch data from bank websites.
+
+**Key differences:**
+
+-   Elbank can automatically fetch transactions from supported banks; Bank Buddy works with CSV exports
+-   Elbank focuses on reporting and visualization; Bank Buddy offers both analysis and reporting
+-   Elbank requires Weboob setup and configuration; Bank Buddy works directly with CSV files
+-   Bank Buddy provides customizable transaction categorization; Elbank may rely on bank-provided categories
+
+**When to use Elbank:** For automated tracking of multiple bank accounts with direct data fetching and basic reporting.
+**When to use Bank Buddy:** For detailed analysis and categorization of bank statements, especially when working with CSV exports or when bank integration isn't available or desired.
+
+
+### Beancount-mode {#beancount-mode}
+
+[Beancount-mode](https://github.com/beancount/beancount-mode) is an Emacs mode for Beancount, another plain-text accounting system.
+
+**Key differences:**
+
+-   Beancount, like Ledger, is a full double-entry accounting system
+-   Beancount has stricter syntax requirements than Ledger
+-   Bank Buddy offers automatic categorization and reporting, while Beancount requires manual entry
+-   Beancount generates sophisticated reports, but requires more setup and knowledge
+
+**When to use Beancount:** For precise, auditable personal accounting with strict validation.
+**When to use Bank Buddy:** For simple spending analysis without learning accounting principles.
+
+
+### csv-mode and orgtbl-mode {#csv-mode-and-orgtbl-mode}
+
+Some users analyze financial CSV data using built-in Emacs packages like csv-mode combined with org-table functionality.
+
+**Key differences:**
+
+-   These are general-purpose tools that require manual customization for financial analysis
+-   Bank Buddy provides specialized, financial-specific analysis and visualization
+-   Bank Buddy automatically categorizes transactions based on patterns
+-   Bank Buddy generates reports without manual processing
+
+**When to use csv/orgtbl-mode:** For custom, one-off analysis of financial data.
+**When to use Bank Buddy:** For consistent, repeatable analysis of bank statements.
+
+
+## Roadmap {#roadmap}
+
+| TODO                      | DOING                                                 | DONE                   |
+|---------------------------|-------------------------------------------------------|------------------------|
+| Add Paypal break down csv | Highlight bank lines not matched for iterative tweaks | Asynchronous operation |
+| Add large sum outlays     | Generate test data and unit test                      |                        |
+| Budget Tracking           | Data Visualization                                    |                        |
+| AI-Powered Categorization | Better gnuplot autogeneration of plots                |                        |
+|                           | Custom Category Mapping                               |                        |

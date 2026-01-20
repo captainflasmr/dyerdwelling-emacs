@@ -1,0 +1,8 @@
+#+options: toc:nil
+#+startup: showall
+
+* Emacs
+
+#+begin_quote
+The almighty emacs, giving me happy vibes
+#+end_quote

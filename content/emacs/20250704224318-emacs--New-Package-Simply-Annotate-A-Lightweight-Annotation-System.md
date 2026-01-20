@@ -1,0 +1,394 @@
+---
+title: "New Package! - Simply Annotate: A Lightweight Annotation System"
+author: ["James Dyer"]
+lastmod: 2025-07-04T22:43:00+01:00
+tags: ["package", "emacs", 2025]
+categories: ["emacs", "linux"]
+draft: false
+thumbnail: "/emacs/20250704224318-emacs--New-Package-Simply-Annotate-A-Lightweight-Annotation-System.jpg"
+---
+
+Yes thats right, yet another annotation system!, in this case it is a lightweight annotation system for Emacs that allows you to add persistent notes to any text file without modifying the original content.
+
+<https://melpa.org/#/simply-annotate>
+<https://github.com/captainflasmr/simply-annotate>
+
+<!--more-->
+
+{{< figure src="/emacs/20250704224318-emacs--New-Package-Simply-Annotate-A-Lightweight-Annotation-System.jpg" width="100%" >}}
+
+Still not convinced it is any different to any other note taking package in Emacs given that previous generic sparse description? Well I shall do my best to explain my own note taking ideas.  Of course this is also just a pet project to continue to learn elisp, so there is that too :)
+
+I developed this package to fill my own perceived gap in the existing Emacs note-taking ecosystem. Although `annotate.el` comes close to what I needed, I wanted a simplified version and something with a few workflow adjustments that better suit my note taking preferences. The result is a lightweight alternative that handles annotations the way I have always wanted them to work.
+
+The main functional aspects that I felt were important to me that generally differ from other existing Emacs annotation packages are:
+
+-   Header-line status display with keybinding reminders
+-   Simple intuitive workflow (hopefully)
+-   Multiple display styles (highlight, fringe indicators, or both)
+-   Annotation editing via a dedicated buffer
+-   Lightweight (if possible &lt;1000 lines - [UPDATE], no its not possible, lets try &lt;2000 lines!)
+-   Multi-purpose key to show/edit/toggle annotations
+-   Dedicated annotation buffer that can pop in and out
+-   Quickly step through annotations with `M-n` and `M-p`
+-   Buffer summary of annotations in grep-mode format
+-   Quickly browse through all annotated files using completing-read
+-   Smart action command that adapts based on context
+-   Threading conversations for each annotation
+
+See <https://github.com/captainflasmr/simply-annotate/blob/main/docs/simply-annotate.org> for the manual!
+
+
+## Quick Demo Video {#quick-demo-video}
+
+Open this file and open the simply-annotate.el file
+
+-   highlight some regions and put in some annotation comments
+
+-   step through annotation comments
+
+-   show summary
+
+-   delete some annotations
+
+Go to the directory level and now browse the 2 files
+
+{{< figure src="/emacs/simply-annotate-screen-recording.gif" width="100%" >}}
+
+
+## Whats New {#whats-new}
+
+
+### <span class="timestamp-wrapper"><span class="timestamp">&lt;2025-07-03 Thu&gt; </span></span> **0.6.0** {#0-dot-6-dot-0}
+
+A little refactoring and tidying up.
+
+
+### <span class="timestamp-wrapper"><span class="timestamp">&lt;2025-06-29 Sun&gt; </span></span> **0.5.1** {#0-dot-5-dot-1}
+
+-   **Raw sexp editing**: Edit annotation data structures directly as Elisp for complete control
+-   **Advanced editing capabilities**: Full access to thread metadata, status, priority, and comments
+
+**Updated Key Bindings:**
+
+-   `M-s e`: Edit annotation as raw Elisp sexp
+
+
+### <span class="timestamp-wrapper"><span class="timestamp">&lt;2025-06-20 Fri&gt; </span></span> **0.5.0** {#0-dot-5-dot-0}
+
+-   **Threading system**: Add replies to annotations for conversations
+-   **Status management**: Track progress (open, in-progress, resolved, closed)
+-   **Priority levels**: Set importance (low, normal, high, critical)
+-   **Multi-author support**: Configure team members for collaboration
+-   **Tag system**: Organize with hashtags (#review, #bug, #question)
+-   **Org-mode export**: Convert threads to structured TODO items
+-   **Enhanced display**: Thread info in headers and lists
+-   **Author management**: Flexible prompting modes and author changes
+
+**New Key Bindings:**
+
+-   `M-s r`: Add reply to annotation
+-   `M-s s`: Set status
+-   `M-s p`: Set priority
+-   `M-s t`: Add tag
+-   `M-s a`: Change author
+-   `M-s o`: Export to org-mode
+
+
+### <span class="timestamp-wrapper"><span class="timestamp">&lt;2025-06-20 Fri&gt; </span></span> **0.0.1** {#0-dot-0-dot-1}
+
+-   Basic annotation functionality
+-   Persistent storage
+-   Navigation commands
+-   Org-mode export
+-   Customizable highlighting
+
+
+## Installation {#installation}
+
+
+### MELPA (Recommended) {#melpa--recommended}
+
+```emacs-lisp
+(use-package simply-annotate
+  :bind ("C-c A" . simply-annotate-mode))
+```
+
+
+### Manual Installation {#manual-installation}
+
+1.  Download `simply-annotate.el`
+2.  Place it in your Emacs `load-path`
+3.  Add to your configuration:
+
+<!--listend-->
+
+```emacs-lisp
+(require 'simply-annotate)
+(global-set-key (kbd "C-c A") simply-annotate-mode)
+```
+
+
+## Quick Start {#quick-start}
+
+1.  Open any file
+2.  Enable annotation mode: `M-x simply-annotate-mode`
+3.  Select/mark text and press `M-s j` to create your first annotation
+4.  Create some more annotations
+5.  Navigate with `M-n` (next) and `M-p` (previous)
+6.  Add replies: Press `M-s r` on any annotation to reply
+7.  Set status: Press `M-s s` to track progress (open/resolved/etc.)
+8.  Advanced editing: Press `M-s e` to edit annotation data structure directly
+
+
+## Usage {#usage}
+
+
+### Enabling Annotation Mode {#enabling-annotation-mode}
+
+```emacs-lisp
+M-x simply-annotate-mode
+```
+
+Or bind to a convenient key:
+
+```emacs-lisp
+(global-set-key (kbd "C-c A") 'simply-annotate-mode)
+```
+
+
+### Creating Annotations {#creating-annotations}
+
+
+#### Simple {#simple}
+
+The `M-s j` command (`simply-annotate-smart-action`) is context-aware:
+
+1.  **With region selected**: Creates new annotation or edits existing one
+2.  **On annotated text**: Toggles annotation buffer visibility
+3.  **With prefix (C-u M-s j)**: Forces edit mode on existing annotation
+4.  **Elsewhere**: Creates annotation for current line
+5.  Enter your annotation text in the dedicated buffer
+6.  Save with `C-c C-c`
+
+
+### Advanced Editing {#advanced-editing}
+
+
+#### Raw Sexp Editing {#raw-sexp-editing}
+
+For complete control over annotation data structures:
+
+1.  Place cursor on any annotation
+2.  Press `M-s e` to open the raw sexp editor
+3.  Edit the Elisp data structure directly:
+    -   Modify thread metadata (status, priority, tags)
+    -   Edit comment text and timestamps
+    -   Add/remove/reorder comments
+    -   Change author information
+4.  Save with `C-c C-c` or cancel with `C-c C-k`
+
+**Example sexp structure:**
+
+```emacs-lisp
+((id . "thread-123456")
+ (created . "2025-06-29T10:30:00")
+ (status . "open")
+ (priority . "high")
+ (tags . ("bug" "critical"))
+ (comments . (((author . "John Doe")
+               (timestamp . "2025-06-29T10:30:00")
+               (text . "Found a critical bug here")
+               (type . "comment"))
+              ((author . "Jane Smith")
+               (timestamp . "2025-06-29T11:15:00")
+               (text . "I can reproduce this issue")
+               (type . "reply")))))
+```
+
+
+### Threading &amp; Collaboration {#threading-and-collaboration}
+
+
+#### Adding Replies {#adding-replies}
+
+1.  Place cursor on any annotation
+2.  Press `M-s r` to add a reply
+3.  Enter your response
+4.  The annotation becomes a threaded conversation
+
+
+#### Status Management {#status-management}
+
+-   Press `M-s s` to set status: open, in-progress, resolved, closed
+-   Press `M-s p` to set priority: low, normal, high, critical
+-   Press `M-s t` to add tags like #review, #bug, #question
+
+
+#### Author Management {#author-management}
+
+Configure for single-user or team workflows:
+
+```emacs-lisp
+;; Single user (default behavior)
+(setq simply-annotate-prompt-for-author nil)
+
+;; Team collaboration
+(setq simply-annotate-author-list '("John Doe" "Jane Smith" "Bob Wilson"))
+(setq simply-annotate-prompt-for-author 'threads-only)  ; Prompt only for replies
+(setq simply-annotate-remember-author-per-file t)       ; Remember per file
+```
+
+Available prompting modes:
+
+-   `nil`: Never prompt (single-user mode)
+-   `'first-only`: Prompt once per session
+-   `'always`: Prompt for every annotation
+-   `'threads-only`: Prompt only for thread replies (great for reviews)
+
+
+#### Author Commands {#author-commands}
+
+-   `M-s a`: Change author of existing annotation/comment
+
+
+### Display Styles {#display-styles}
+
+Simply Annotate supports three display styles:
+
+-   **Highlight**: Traditional background highlighting (default)
+-   **Fringe**: Shows indicators in the left fringe
+-   **Both**: Combines highlighting with fringe indicators
+
+Change styles with `M-s ]` or customize `simply-annotate-display-style`.
+
+
+### Viewing Annotations {#viewing-annotations}
+
+When `simply-annotate-mode` is active:
+
+-   Annotated text is displayed according to your chosen style
+-   The header line shows annotation count, status info, and available commands
+-   \* Thread info\*: Header shows `[OPEN/HIGH:3]` for status, priority, and comment count
+-   Moving to annotated text shows annotation details in the header
+-   Press `M-s j` on annotated text to view/edit in detail
+
+
+### Navigation {#navigation}
+
+| Key Binding | Action                       |
+|-------------|------------------------------|
+| `M-n`       | Jump to next annotation      |
+| `M-p`       | Jump to previous annotation  |
+| `M-s j`     | Smart action (context-aware) |
+
+
+### Managing Annotations {#managing-annotations}
+
+
+#### Creating {#creating}
+
+-   Select/mark some text
+-   Press `M-s j` to open the annotation buffer
+-   Make your changes
+-   Save with `C-c C-c`
+
+
+#### Editing {#editing}
+
+**Standard Editing:**
+
+-   Place cursor on annotated text
+-   Press `C-u M-s j` to open the annotation buffer
+-   Make your changes
+-   Save with `C-c C-c`
+
+**Advanced Sexp Editing:**
+
+-   Place cursor on annotated text
+-   Press `M-s e` to open the raw sexp editor
+-   Edit the complete data structure
+-   Save with `C-c C-c` or cancel with `C-c C-k`
+
+
+#### Deleting {#deleting}
+
+-   Place cursor on annotated text
+-   Press `M-s -` to remove the annotation
+
+
+#### Listing All Annotations {#listing-all-annotations}
+
+-   Press `M-s l` to open a grep-mode buffer showing all annotations in the current file
+-   ****Enhanced display****: Shows thread status, priority, comment counts, and author info
+-   Click on line numbers, press `Enter` or `n/p` keys to jump directly to annotations
+-   Perfect for getting an overview of all your notes and their status
+
+
+#### Cross-file Overview {#cross-file-overview}
+
+-   Press `M-s 0` to browse annotations across all files
+-   Select a file from the completion list
+-   ****Statistics****: Shows annotation counts and status summaries per file
+-   View all annotations for that file in `grep-mode` format
+-   Source file is presented along with `grep-mode` list of annotations
+
+
+### Org-mode Integration {#org-mode-integration}
+
+Export your annotation threads to org-mode files for further processing:
+
+-   Press `M-s o` to export current buffer annotations to an org file
+-   Each thread becomes a TODO item with proper metadata
+-   Replies become sub-entries
+-   Status, priority, tags, and timestamps are preserved
+
+
+## Tips and Tricks {#tips-and-tricks}
+
+
+### Workflow Suggestions {#workflow-suggestions}
+
+Enable the mode globally if you wish for all files!
+
+```emacs-lisp
+(use-package simply-annotate
+  :hook
+  (find-file-hook . simply-annotate-mode)
+  :bind
+  ("C-c A" . simply-annotate-mode)
+  ("C-c 0" . simply-annotate-show-all))
+```
+
+
+### Smart Action Usage Patterns {#smart-action-usage-patterns}
+
+-   **Quick annotation**: No selection, `M-s j` to annotate current line
+-   **Edit existing**: `C-u M-s j` on annotated text to force edit mode
+-   **Toggle view**: `M-s j` on annotated text to show/hide annotation buffer
+-   **Region annotation**: Select text, `M-s j` to create detailed annotation
+
+
+### Advanced Editing Tips {#advanced-editing-tips}
+
+-   **Bulk operations**: Use `M-s e` to edit multiple comments at once in sexp mode
+-   **Data migration**: Copy annotation structures between files using sexp editing
+-   **Precision control**: Manually adjust timestamps, IDs, or metadata via sexp editing
+-   **Complex threading**: Create sophisticated reply structures that aren't possible through the UI
+
+
+### Display Style Tips {#display-style-tips}
+
+-   Use **fringe** mode for code files to minimize visual distraction
+-   Use **highlight** mode for documents where you want emphasis
+-   Use **both** mode for critical files requiring maximum attention
+-   Change styles on-the-fly with `M-s ]` based on current task
+
+
+### Performance Notes {#performance-notes}
+
+-   Annotations are loaded on-demand per buffer
+-   Large numbers of annotations (100+) may slightly impact performance
+-   Fringe mode generally has better performance than highlight mode
+-   ****Threading****: Complex threads (10+ replies) may slow annotation buffer rendering
+-   ****Sexp editing****: Large annotation structures may take a moment to format and parse
