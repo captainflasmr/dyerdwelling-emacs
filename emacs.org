@@ -102,7 +102,7 @@ Also, Not all words are created equal:
 
 This mimics natural reading rhythms where you'd naturally pause at sentence boundaries.
 
-While reading, you can try these kebindings: (which I borrowed off *spray*)
+While reading, you can try these keybindings: (which I borrowed off *spray*)
 
 - =f= / =s= - Speed up or slow down (±50 WPM)
 - =[= / =]= - Decrease or increase font size
