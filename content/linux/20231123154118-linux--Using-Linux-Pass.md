@@ -57,10 +57,10 @@ retrieves the password, if the database is already open then the password is to 
 Then this can be used for retrieving for example an openai-key from emacs chatgpt-shell:
 
 ```elisp
-(use-package chatgpt-shell
-  :ensure t
-  :custom
-  ((chatgpt-shell-openai-key
-     (lambda ()
-       (auth-source-pass-get 'secret "openai-key")))))
+  (use-package chatgpt-shell
+    :ensure t
+    :custom
+    ((chatgpt-shell-openai-key
+       (lambda ()
+         (auth-source-pass-get 'secret "openai-key")))))
 ```

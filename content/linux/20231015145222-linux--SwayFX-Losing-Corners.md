@@ -12,7 +12,7 @@ I seemed to temporarily lose the rounded corners in **SwayFX** and I think the r
 
 <!--more-->
 
-{{< figure src="/ox-hugo/20231015145222-emacs--SwayFX-Losing-Corners.jpg" width="100%" >}}
+{{< figure src="/linux/20231015145222-emacs--SwayFX-Losing-Corners.jpg" width="100%" >}}
 
 `gaps inner 8px`
 

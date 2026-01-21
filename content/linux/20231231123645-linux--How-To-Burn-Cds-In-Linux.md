@@ -19,7 +19,7 @@ Run up K3b (K3b startup may require patience - ignore any errors regarding execu
 
 Menu -&gt; Tools -&gt; Rip Audio CD...
 
-{{< figure src="/ox-hugo/2024-01-01-15-30-30_001.jpg" width="60%" >}}
+{{< figure src="/linux/20231231123645-linux--How-To-Burn-Cds-In-Linux/2024-01-01-15-30-30_001.jpg" width="60%" >}}
 
 A window showing the tracks to rip will be displayed
 
@@ -39,7 +39,7 @@ A window showing the tracks to rip will be displayed
 
 **Start Ripping** (a dialog showing Ripping Audio Tracks from ... will be displayed)
 
-{{< figure src="/ox-hugo/2024-01-01-10-21-00.jpg" width="80%" >}}
+{{< figure src="/linux/20231231123645-linux--How-To-Burn-Cds-In-Linux/2024-01-01-10-21-00.jpg" width="80%" >}}
 
 Wait for all tracks to be ripped into selected location and **Success** to be displayed
 
@@ -62,7 +62,7 @@ If the album is one of a multiple set of disks then prepend an integer dash, for
 
 In a file explorer, Navigate to the ripped folder right click and Open With -&gt; EasyTAG
 
-{{< figure src="/ox-hugo/2024-01-01-15-21-44_001.jpg" width="80%" >}}
+{{< figure src="/linux/20231231123645-linux--How-To-Burn-Cds-In-Linux/2024-01-01-15-21-44_001.jpg" width="80%" >}}
 
 You can add any additional tags at this stage but as k3b will have validly auto tagged all the main ones we just need to add some cover art.
 
@@ -70,7 +70,7 @@ Search for the album cover art online and screenshot the album image.
 
 In EasyTag, select all the tracks, on the right hand side select the Images tab, drag and drop in the captured image then select the image icon at the bottom of the image tab which will copy the image to all selected tracks and select the **Save** icon to save all tracks.
 
-{{< figure src="/ox-hugo/2024-01-01-15-52-14.jpg" width="80%" >}}
+{{< figure src="/linux/20231231123645-linux--How-To-Burn-Cds-In-Linux/2024-01-01-15-52-14.jpg" width="80%" >}}
 
 
 ## Copy in to main Music folder {#copy-in-to-main-music-folder}

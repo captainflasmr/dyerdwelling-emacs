@@ -12,12 +12,12 @@ Currently I am just displaying the title of my posts with no filtering.  Now tha
 
 <!--more-->
 
-{{< figure src="/ox-hugo/linux--hugo-text-title-tidying__linux_hugo.jpg" width="100%" >}}
+{{< figure src="/linux/linux--hugo-text-title-tidying__linux_hugo.jpg" width="100%" >}}
 
 For example a typical title format is the following:
 
 ```text
-Linux ---> Hugo_Format_Title[tag@subtag-art]
+  Linux ---> Hugo_Format_Title[tag@subtag-art]
 ```
 
 and the hugo rendered html of course displays this on a card list and on a single page.  I would like to remove the `Linux --->` part and the tag part to optimise the space taken up by the title.

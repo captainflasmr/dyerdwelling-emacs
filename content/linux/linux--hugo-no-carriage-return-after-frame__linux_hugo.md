@@ -29,7 +29,7 @@ Using ArtRage and Infinite Painter on various drawing tablets
 
 which produces the following displayed html:
 
-{{< figure src="/ox-hugo/2022-09-01_11-02.jpg" width="100%" >}}
+{{< figure src="/linux/linux--hugo-no-carriage-return-after-frame__linux_hugo/2022-09-01_11-02.jpg" width="100%" >}}
 
 Note how the text starts right after the youtube video even though the markdown includes a carriage return.
 
@@ -52,7 +52,7 @@ iframe {
 
 I have just applied a little padding to the bottom of the iframe!  I thought I would include `margin` also just in case I wanted to do it that way in the future.  Right lets see what this looks like now:
 
-{{< figure src="/ox-hugo/2022-09-01_11-16.jpg" width="100%" >}}
+{{< figure src="/linux/linux--hugo-no-carriage-return-after-frame__linux_hugo/2022-09-01_11-16.jpg" width="100%" >}}
 
 yup that will do nicely!
 

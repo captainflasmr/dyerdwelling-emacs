@@ -20,14 +20,14 @@ Import the image into GIMP and perform the following to tweak the image so the p
 
 and now to print, here are the typical setting that will work:
 
-{{< figure src="/ox-hugo/Screenshot_20230305_195253.jpg" width="300px" >}}
+{{< figure src="/linux/20230305194837-emacs--Digital-Art-Printing/Screenshot_20230305_195253.jpg" width="300px" >}}
 
-{{< figure src="/ox-hugo/Screenshot_20230305_195303.jpg" width="300px" >}}
+{{< figure src="/linux/20230305194837-emacs--Digital-Art-Printing/Screenshot_20230305_195303.jpg" width="300px" >}}
 
-{{< figure src="/ox-hugo/Screenshot_20230305_195337.jpg" width="300px" >}}
+{{< figure src="/linux/20230305194837-emacs--Digital-Art-Printing/Screenshot_20230305_195337.jpg" width="300px" >}}
 
-{{< figure src="/ox-hugo/Screenshot_20230305_195343.jpg" width="300px" >}}
+{{< figure src="/linux/20230305194837-emacs--Digital-Art-Printing/Screenshot_20230305_195343.jpg" width="300px" >}}
 
-{{< figure src="/ox-hugo/Screenshot_20230305_195402.jpg" width="300px" >}}
+{{< figure src="/linux/20230305194837-emacs--Digital-Art-Printing/Screenshot_20230305_195402.jpg" width="300px" >}}
 
 I tend to print on glossy photo paper these days but generally I think it is best to select Photo / Photo paper as these tend to produce the better results.

@@ -139,7 +139,7 @@ categories_counter = true
     source = "content/linux"
     target = "content/linux"
   [[module.mounts]]
-    source = "content/blog"
+    source = "content/blog-emacs"
     target = "content/blog"
   [[module.mounts]]
     source = "content/tags"

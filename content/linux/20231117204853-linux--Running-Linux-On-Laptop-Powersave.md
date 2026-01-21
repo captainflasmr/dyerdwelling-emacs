@@ -12,7 +12,7 @@ There are quite a few different ways to reduce power consumption on a laptop, mo
 
 <!--more-->
 
-{{< figure src="/ox-hugo/20231117204853-emacs--Running-Linux-On-Laptop-Powersave.jpg" class="emacs-img" >}}
+{{< figure src="/linux/20231117204853-emacs--Running-Linux-On-Laptop-Powersave.jpg" class="emacs-img" >}}
 
 Table Of Contents
 ---
@@ -36,8 +36,8 @@ Table Of Contents
 I chose to use `auto-cpufreq` and it encourages you to manually install, so:
 
 ```bash
-git clone https://github.com/AdnanHodzic/auto-cpufreq.git
-cd auto-cpufreq && sudo ./auto-cpufreq-installer
+  git clone https://github.com/AdnanHodzic/auto-cpufreq.git
+  cd auto-cpufreq && sudo ./auto-cpufreq-installer
 ```
 
 and then I just ran the GUI version and installed the systemd unit which will be activated now on every startup.

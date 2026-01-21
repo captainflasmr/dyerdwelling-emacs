@@ -31,7 +31,7 @@ Here is a suggested way to resolve this issue:
     causing the conflict, you can remove it before installing the update.
     This can be done using the following command:
     ```sh
-    sudo pacman -R adw-gtk3
+          sudo pacman -R adw-gtk3
     ```
 
 2.  **Overwrite the conflicts** (if needed): If removing the conflicting
@@ -39,13 +39,13 @@ Here is a suggested way to resolve this issue:
     the existing files. This tells `pacman` to ignore file conflicts and
     proceed with the update:
     ```sh
-    sudo pacman -Syu --overwrite "*"
+          sudo pacman -Syu --overwrite "*"
     ```
 
 3.  **Reinstall the adw-gtk3 package** (if necessary): If you still need
     the `adw-gtk3` package after updating, you can reinstall it:
     ```sh
-    sudo pacman -S adw-gtk3
+          sudo pacman -S adw-gtk3
     ```
 
 

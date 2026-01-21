@@ -73,17 +73,17 @@ To print open up the `front` and `back` images into GIMP as Krita currently does
 
 Print using the following settings:
 
-{{< figure src="/ox-hugo/20231001155909-emacs--Advent-Calendar-Creation_a.jpg" width="100%" >}}
+{{< figure src="/linux/20231001155909-emacs--Advent-Calendar-Creation/20231001155909-emacs--Advent-Calendar-Creation_a.jpg" width="100%" >}}
 
-{{< figure src="/ox-hugo/20231001155909-emacs--Advent-Calendar-Creation_b.jpg" width="100%" >}}
+{{< figure src="/linux/20231001155909-emacs--Advent-Calendar-Creation/20231001155909-emacs--Advent-Calendar-Creation_b.jpg" width="100%" >}}
 
-{{< figure src="/ox-hugo/20231001155909-emacs--Advent-Calendar-Creation_c.jpg" width="100%" >}}
+{{< figure src="/linux/20231001155909-emacs--Advent-Calendar-Creation/20231001155909-emacs--Advent-Calendar-Creation_c.jpg" width="100%" >}}
 
-{{< figure src="/ox-hugo/20231001155909-emacs--Advent-Calendar-Creation_d.jpg" width="100%" >}}
+{{< figure src="/linux/20231001155909-emacs--Advent-Calendar-Creation/20231001155909-emacs--Advent-Calendar-Creation_d.jpg" width="100%" >}}
 
-{{< figure src="/ox-hugo/20231001155909-emacs--Advent-Calendar-Creation_e.jpg" width="100%" >}}
+{{< figure src="/linux/20231001155909-emacs--Advent-Calendar-Creation/20231001155909-emacs--Advent-Calendar-Creation_e.jpg" width="100%" >}}
 
-{{< figure src="/ox-hugo/20231001155909-emacs--Advent-Calendar-Creation_f.jpg" width="100%" >}}
+{{< figure src="/linux/20231001155909-emacs--Advent-Calendar-Creation/20231001155909-emacs--Advent-Calendar-Creation_f.jpg" width="100%" >}}
 
 
 ## create {#create}

@@ -12,7 +12,7 @@ This year I have been starting to archive anything of interest from the family V
 
 <!--more-->
 
-{{< figure src="/ox-hugo/2022-12-26_15-35_1.jpg" width="300px" height="100px" >}}
+{{< figure src="/linux/20221222210546-linux--Burning-To-DVD/2022-12-26_15-35_1.jpg" width="300px" height="100px" >}}
 
 But I did find a film that my mum loves and she really doesn't want to lose, so what better way than to burn a captured video file to DVD and what better way than to use free and open software on linux to achieve this.  (I will go into how I captured the video at a later date)
 
@@ -28,7 +28,7 @@ It then started to dawn on me that in the past I have created DVDs using paid pr
 
 A basic Video DVD project in k3b contained two folders that had been automatically created:
 
-{{< figure src="/ox-hugo/2022-12-26_15-35.jpg" width="300px" >}}
+{{< figure src="/linux/20221222210546-linux--Burning-To-DVD/2022-12-26_15-35.jpg" width="300px" >}}
 
 On further investigation through the k3b documentation it states the following:
 
@@ -38,7 +38,7 @@ On further investigation through the k3b documentation it states the following:
 
 Aha!, so in fact I need to convert my mp4 file to a DVD ready format through **DeVeDe**!  Not obvious, but ok.  This software is in the official arch repositories, so I download, run up, create a **Video DVD** project, drag and drop the mp4 and just navigate through the next steps to generate files into an AUDIO_TS and VIDEO_TS folder.
 
-{{< figure src="/ox-hugo/2022-12-26_15-34.jpg" width="300px" >}}
+{{< figure src="/linux/20221222210546-linux--Burning-To-DVD/2022-12-26_15-34.jpg" width="300px" >}}
 
 By default Devede creates an output `movie` folder in your home directory and the AUDIO_TS and VIDEO_TS folders are located in the `dvd_tree` subdirectory.  Presumably the other folders are for a more complicated DVD setup including menu functionality, but this will be a simple present and I'm not interested in anything fancy I just want a film to be played on a DVD player.
 
