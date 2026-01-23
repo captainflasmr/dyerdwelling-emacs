@@ -106,17 +106,7 @@ posts = "/:slug/"
 notes = "/:slug/"
 
 [outputs]
-home = ["HTML", "RSS", "htaccess", "JSON"]
-
-[outputFormats]
-[outputFormats.htaccess]
-baseName = ""
-isPlainText = true
-mediaType = "text/htaccess"
-
-[mediaTypes]
-[mediaTypes."text/htaccess"]
-suffixes = ["htaccess"]
+home = ["HTML", "RSS", "JSON"]
 
 [Params.sidebar]
 home = "right"   # Configure layout for home page
