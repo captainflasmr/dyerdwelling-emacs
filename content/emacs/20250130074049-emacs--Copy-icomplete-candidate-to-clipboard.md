@@ -8,13 +8,13 @@ draft: false
 thumbnail: "/emacs/20250130074049-emacs--Copy-icomplete-candidate-to-clipboard.jpg"
 ---
 
-{{< figure src="/emacs/20250130074049-emacs--Copy-icomplete-candidate-to-clipboard.jpg" width="100%" >}}
-
 In my continuing quest to replace all my external use packages with my own elisp versions so I can still follow my current workflow on an air-gapped system, I would like to replace a single function I use often from `embark`
 
 `embark` allows an action in a certain context, and there are a lot of actions to choose from, but I found I was generally using very few, so to remove my reliance on `embark` I think I can implement these actions myself.
 
 <!--more-->
+
+{{< figure src="/emacs/20250130074049-emacs--Copy-icomplete-candidate-to-clipboard.jpg" width="100%" >}}
 
 The main one is to copy the current completion candidate.  For example, I might be searching for a function name, so `describe-function` function for example, ha!, I just did it!, using `describe-function` to select `describe-function` and then copying to the clipboard to then paste in to this blog article!
 

@@ -9,6 +9,45 @@
 #+latex_header: \fancyhead[C]{Emacs Blog}
 #+exclude_tags: noexport
 #+filetags: :@emacs:@linux:
+* DONE Auto-Populating Weekly Dates in Org-Mode Tables :emacs:2026:org:
+:PROPERTIES:
+:EXPORT_FILE_NAME: 20260126101317-emacs--Auto-Populating-Weekly-Dates-in-Org-Mode-Tables
+:EXPORT_HUGO_SECTION: emacs
+:EXPORT_HUGO_LASTMOD: <2026-01-26 10:13>
+:EXPORT_HUGO_CUSTOM_FRONT_MATTER+: :thumbnail /emacs/20260126101317-emacs--Auto-Populating-Weekly-Dates-in-Org-Mode-Tables.jpg
+:END:
+
+Here is just a quick one, I was working with an org-mode table for tracking work weeks and needed to auto-populate a Date column where each row increments by exactly one week. The table structure looked like this:
+
+#+hugo: more
+
+#+attr_org: :width 300px
+#+attr_html: :width 100%
+[[file:static/emacs/20260126101317-emacs--Auto-Populating-Weekly-Dates-in-Org-Mode-Tables.jpg]]
+
+The first row has a base date (2026-01-05), and I wanted subsequent rows to automatically calculate as weekly increments: 2026-01-12, 2026-01-19, and so on.
+
+Initially, I tried several approaches that seemed logical but encountered =#ERROR= results and eventually settled on a working solution which is to hardcode the base date directly in the formula:
+
+#+begin_src org
+#+TBLFM: $3='(format-time-string "%Y-%m-%d" (time-add (date-to-time "2026-01-05") (* (- @# 2) 7 24 3600)))
+#+end_src
+
+which gave:
+
+#+attr_org: :width 300px
+#+attr_html: :width 100%
+[[file:static/emacs/20260126101317-emacs--Auto-Populating-Weekly-Dates-in-Org-Mode-Tables2.jpg]]
+
+and I can now of course extend the table for all the weeks in the year and I don't have to fill in manually any more!
+
+Here's how it works:
+
+   - =(date-to-time "2026-01-05")= - Convert the hardcoded base date to Emacs time format
+   - =(- @# 2)= - Calculate the offset from the base row
+   - =(* (- @# 2) 7 24 3600)= - Convert the offset to seconds (weeks × days × hours × seconds)
+   - =time-add= - Add the offset to the base date
+   - =format-time-string "%Y-%m-%d"= - Format back to ISO date string
 
 * DONE Speed Reading in Emacs: Building an RSVP Reader :emacs:2026:
 :PROPERTIES:
@@ -18,13 +57,13 @@
 :EXPORT_HUGO_CUSTOM_FRONT_MATTER+: :thumbnail /emacs/20260116182841-emacs--Speed-Reading-in-Emacs:-Building-an-RSVP-Reader.jpg
 :END:
 
-#+attr_org: :width 300px
-#+attr_html: :width 100%
-[[file:static/emacs/20260116182841-emacs--Speed-Reading-in-Emacs:-Building-an-RSVP-Reader.jpg]]
-
 I recently came across a fascinating video titled "How Fast Can You Read? - Speed Reading Challenge" that demonstrated the power of RSVP (Rapid Serial Visual Presentation) for speed reading. The concept  is quite nice and simple and I vaguely remember seeing something about it a few years back.  Instead of your eyes scanning across lines of text, words are presented one at a time in a fixed position. This eliminates the mechanical overhead of eye movements and can dramatically increase reading speed!
 
 #+hugo: more
+
+#+attr_org: :width 300px
+#+attr_html: :width 100%
+[[file:static/emacs/20260116182841-emacs--Speed-Reading-in-Emacs:-Building-an-RSVP-Reader.jpg]]
 
 So, I immediately wondered, could I build this into Emacs?, actually no, firstly I thought, are there any packages for Emacs that can do this?, of course there are!, the *spray* package from MELPA is a more mature, feature-rich option if you're looking for production-ready RSVP reading in Emacs, and also there is *speedread*.  However, there's something satisfying about having a compact, single-function solution that does exactly what you need, so lets see if I can build one!
 
@@ -843,10 +882,6 @@ The package processes up to 4 videos concurrently by default. For directories wi
 :EXPORT_HUGO_CUSTOM_FRONT_MATTER+: :thumbnail /emacs/20251216082551-emacs--Setting-Up-Emacs-for-Csharp-Development-on-Windows.jpg
 :END:
 
-#+attr_org: :width 300px
-#+attr_html: :width 100%
-[[file:static/emacs/20251216082551-emacs--Setting-Up-Emacs-for-Csharp-Development-on-Windows.jpg]]
-
 ** Introduction
 
 I have been developing C# with .NET 9.0 for the last year on Windows and I thought it was probably time to write down my current setup, and maybe someone might even find this useful!
@@ -856,6 +891,10 @@ So, this guide documents my setup for running Emacs 30.1 on Windows with full C#
 A version of this can be found at https://github.com/captainflasmr/Emacs-on-windows which will be a living continually updated version!
 
 #+hugo: more 
+
+#+attr_org: :width 300px
+#+attr_html: :width 100%
+[[file:static/emacs/20251216082551-emacs--Setting-Up-Emacs-for-Csharp-Development-on-Windows.jpg]]
 
 ** Prerequisites
 
@@ -1828,13 +1867,13 @@ This package is provided as-is for personal and professional use.
 :EXPORT_HUGO_CUSTOM_FRONT_MATTER+: :thumbnail /emacs/20251101152419-emacs--The-Ping-Localhost-Hack-for-Emacs-Shell-on-Windows.jpg
 :END:
 
-#+attr_org: :width 300px
-#+attr_html: :width 100%
-[[file:static/emacs/20251101152419-emacs--The-Ping-Localhost-Hack-for-Emacs-Shell-on-Windows.jpg]]
-
 For a little while now, I've been developing software that needs to run on Windows (I know, I know!) and occasionally firing up batch scripts from within Emacs shell. Everything was working perfectly until I needed to add a simple delay between commands. That's when I discovered one of Windows batch scripting's more peculiar quirks.
 
 #+hugo: more
+
+#+attr_org: :width 300px
+#+attr_html: :width 100%
+[[file:static/emacs/20251101152419-emacs--The-Ping-Localhost-Hack-for-Emacs-Shell-on-Windows.jpg]]
 
 The obvious solution for adding a delay in a Windows batch script is the =timeout= command:
 
@@ -3315,11 +3354,11 @@ We'll explore:
 
 Not much of a post this week (and in fact this is pretty low effort!), but here I present some fun with image generative AI!
 
+#+hugo: more
+
 #+attr_org: :width 300px
 #+attr_html: :width 100%
 [[file:static/emacs/20250710125504-emacs--Red-Pandas-Also-Love-Emacs.jpg]]
-
-#+hugo: more
 
 That is all 😀
 
@@ -6609,11 +6648,11 @@ Chat buffer now in org-mode
 
 I've been a busy little bee in the last few days, so quite a few improvements to =ollama-buddy=, my Emacs LLM =ollama= client, they are listed below:
 
+#+hugo: more
+
 #+attr_org: :width 300px
 #+attr_html: :width 100%
 [[file:static/emacs/ollama-buddy-banner.jpg]]
-
-#+hugo: more
 
 ** <2025-03-07> *0.5.1*
 
@@ -7975,15 +8014,15 @@ Let's compare ollama-buddy to the existing solutions:
 :EXPORT_HUGO_CUSTOM_FRONT_MATTER+: :thumbnail /emacs/20250130074049-emacs--Copy-icomplete-candidate-to-clipboard.jpg
 :END:
 
-#+attr_org: :width 300px
-#+attr_html: :width 100%
-[[file:static/emacs/20250130074049-emacs--Copy-icomplete-candidate-to-clipboard.jpg]]
-
 In my continuing quest to replace all my external use packages with my own elisp versions so I can still follow my current workflow on an air-gapped system, I would like to replace a single function I use often from =embark=
 
 =embark= allows an action in a certain context, and there are a lot of actions to choose from, but I found I was generally using very few, so to remove my reliance on =embark= I think I can implement these actions myself.
 
 #+hugo: more
+
+#+attr_org: :width 300px
+#+attr_html: :width 100%
+[[file:static/emacs/20250130074049-emacs--Copy-icomplete-candidate-to-clipboard.jpg]]
 
 The main one is to copy the current completion candidate.  For example, I might be searching for a function name, so =describe-function= function for example, ha!, I just did it!, using =describe-function= to select =describe-function= and then copying to the clipboard to then paste in to this blog article!
 

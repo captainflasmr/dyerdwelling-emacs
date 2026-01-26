@@ -24,6 +24,7 @@ themes/*
 # Ignore art/dyerdwelling configs
 config/config-art.toml
 config/config-dyerdwelling.toml
+config/config-katieboo85.toml
 
 # Ignore non-emacs org files
 art.org

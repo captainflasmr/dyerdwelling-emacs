@@ -8,9 +8,6 @@ draft: false
 thumbnail: "/emacs/20251216082551-emacs--Setting-Up-Emacs-for-Csharp-Development-on-Windows.jpg"
 ---
 
-{{< figure src="/emacs/20251216082551-emacs--Setting-Up-Emacs-for-Csharp-Development-on-Windows.jpg" width="100%" >}}
-
-
 ## Introduction {#introduction}
 
 I have been developing C# with .NET 9.0 for the last year on Windows and I thought it was probably time to write down my current setup, and maybe someone might even find this useful!
@@ -20,6 +17,8 @@ So, this guide documents my setup for running Emacs 30.1 on Windows with full C#
 A version of this can be found at <https://github.com/captainflasmr/Emacs-on-windows> which will be a living continually updated version!
 
 <!--more-->
+
+{{< figure src="/emacs/20251216082551-emacs--Setting-Up-Emacs-for-Csharp-Development-on-Windows.jpg" width="100%" >}}
 
 
 ## Prerequisites {#prerequisites}

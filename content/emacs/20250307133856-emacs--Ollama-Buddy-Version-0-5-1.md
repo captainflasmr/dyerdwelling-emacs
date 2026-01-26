@@ -10,9 +10,9 @@ thumbnail: "/emacs/20250224154229-emacs--Ollama-Buddy-Now-On-MELPA.jpg"
 
 I've been a busy little bee in the last few days, so quite a few improvements to `ollama-buddy`, my Emacs LLM `ollama` client, they are listed below:
 
-{{< figure src="/emacs/ollama-buddy-banner.jpg" width="100%" >}}
-
 <!--more-->
+
+{{< figure src="/emacs/ollama-buddy-banner.jpg" width="100%" >}}
 
 
 ## <span class="timestamp-wrapper"><span class="timestamp">&lt;2025-03-07 Fri&gt; </span></span> **0.5.1** {#0-dot-5-dot-1}

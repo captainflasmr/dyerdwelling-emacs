@@ -8,11 +8,11 @@ draft: false
 thumbnail: "/emacs/20260116182841-emacs--Speed-Reading-in-Emacs:-Building-an-RSVP-Reader.jpg"
 ---
 
-{{< figure src="/emacs/20260116182841-emacs--Speed-Reading-in-Emacs:-Building-an-RSVP-Reader.jpg" width="100%" >}}
-
 I recently came across a fascinating video titled "How Fast Can You Read? - Speed Reading Challenge" that demonstrated the power of RSVP (Rapid Serial Visual Presentation) for speed reading. The concept  is quite nice and simple and I vaguely remember seeing something about it a few years back.  Instead of your eyes scanning across lines of text, words are presented one at a time in a fixed position. This eliminates the mechanical overhead of eye movements and can dramatically increase reading speed!
 
 <!--more-->
+
+{{< figure src="/emacs/20260116182841-emacs--Speed-Reading-in-Emacs:-Building-an-RSVP-Reader.jpg" width="100%" >}}
 
 So, I immediately wondered, could I build this into Emacs?, actually no, firstly I thought, are there any packages for Emacs that can do this?, of course there are!, the **spray** package from MELPA is a more mature, feature-rich option if you're looking for production-ready RSVP reading in Emacs, and also there is **speedread**.  However, there's something satisfying about having a compact, single-function solution that does exactly what you need, so lets see if I can build one!
 
@@ -88,7 +88,7 @@ Also, Not all words are created equal:
 
 This mimics natural reading rhythms where you'd naturally pause at sentence boundaries.
 
-While reading, you can try these kebindings: (which I borrowed off **spray**)
+While reading, you can try these keybindings: (which I borrowed off **spray**)
 
 -   `f` / `s` - Speed up or slow down (±50 WPM)
 -   `[` / `]` - Decrease or increase font size

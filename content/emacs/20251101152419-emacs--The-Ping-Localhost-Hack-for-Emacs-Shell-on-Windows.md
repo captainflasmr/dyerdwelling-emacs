@@ -8,11 +8,11 @@ draft: false
 thumbnail: "/emacs/20251101152419-emacs--The-Ping-Localhost-Hack-for-Emacs-Shell-on-Windows.jpg"
 ---
 
-{{< figure src="/emacs/20251101152419-emacs--The-Ping-Localhost-Hack-for-Emacs-Shell-on-Windows.jpg" width="100%" >}}
-
 For a little while now, I've been developing software that needs to run on Windows (I know, I know!) and occasionally firing up batch scripts from within Emacs shell. Everything was working perfectly until I needed to add a simple delay between commands. That's when I discovered one of Windows batch scripting's more peculiar quirks.
 
 <!--more-->
+
+{{< figure src="/emacs/20251101152419-emacs--The-Ping-Localhost-Hack-for-Emacs-Shell-on-Windows.jpg" width="100%" >}}
 
 The obvious solution for adding a delay in a Windows batch script is the `timeout` command:
 
