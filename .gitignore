@@ -26,6 +26,9 @@ config/config-art.toml
 config/config-dyerdwelling.toml
 config/config-katieboo85.toml
 
+# Ignore css
+static/assets/css/style-dyer.css
+
 # Ignore non-emacs org files
 art.org
 blog.org
