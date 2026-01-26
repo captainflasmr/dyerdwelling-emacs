@@ -17,9 +17,7 @@ static/*
 !static/assets/
 !static/images/
 
-# Ignore all themes except hyde
-themes/*
-!themes/hyde/
+# Themes are managed as git submodules
 
 # Ignore art/dyerdwelling configs
 config/config-art.toml

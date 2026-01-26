@@ -1,0 +1,36 @@
+[submodule "themes/beautifulhugo"]
+	path = themes/beautifulhugo
+	url = https://github.com/halogenica/beautifulhugo
+[submodule "themes/hugo-clarity"]
+	path = themes/hugo-clarity
+	url = https://github.com/chipzoller/hugo-clarity
+[submodule "themes/Hugo-Octopress"]
+	path = themes/Hugo-Octopress
+	url = https://github.com/parsiya/hugo-octopress
+[submodule "themes/hugo-paper"]
+	path = themes/hugo-paper
+	url = https://github.com/nanxiaobei/hugo-paper
+[submodule "themes/hugo-theme-m10c"]
+	path = themes/hugo-theme-m10c
+	url = https://github.com/vaga/hugo-theme-m10c
+[submodule "themes/hugo-theme-notrack"]
+	path = themes/hugo-theme-notrack
+	url = https://github.com/gevhaz/hugo-theme-notrack
+[submodule "themes/hugo-xmag"]
+	path = themes/hugo-xmag
+	url = https://github.com/yihui/hugo-xmag
+[submodule "themes/hyde"]
+	path = themes/hyde
+	url = https://github.com/spf13/hyde
+[submodule "themes/lightbi-hugo"]
+	path = themes/lightbi-hugo
+	url = https://github.com/binokochumolvarghese/lightbi-hugo
+[submodule "themes/Mainroad"]
+	path = themes/Mainroad
+	url = https://github.com/vimux/mainroad
+[submodule "themes/risotto"]
+	path = themes/risotto
+	url = https://github.com/joeroe/risotto
+[submodule "themes/hugo-bootstrap-gallery"]
+	path = themes/hugo-bootstrap-gallery
+	url = https://github.com/captainflasmr/hugo-bootstrap-gallery
