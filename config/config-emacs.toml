@@ -2,7 +2,7 @@
 baseurl = "https://www.emacs.dyerdwelling.family/"
 canonifyurls = false
 relativeURL = true
-theme = "hyde"
+theme = "hugo-bootstrap-gallery"
 DefaultContentLanguage = "en"
 title="Emacs@ Dyerdwelling"
 
@@ -25,8 +25,8 @@ title="Emacs@ Dyerdwelling"
   post_meta = ["author", "date", "categories"] # Order of post meta information
   readmore = true
   thumbnail_hide_post = true
-  custom_css = ["assets/css/bootstrap.css", "assets/css/style.css"]
-  customCSS = ["assets/css/bootstrap.css", "assets/css/style.css"]
+  custom_css = ["assets/css/bootstrap.css", "assets/css/style-emacs.css"]
+  customCSS = ["assets/css/bootstrap.css", "assets/css/style-emacs.css"]
   site_logo = "/images/banner/Emacs-rictus.jpg"
   navbar_background = "/images/banner/navbar-emacs.jpg"
   footer = "© 2025 James Dyer all rights reserved"
