@@ -186,6 +186,116 @@ $(for name in "${!THEMES[@]}"; do echo "- $name: ${THEMES[$name]}"; done | sort)
     echo "Done."
 }
 
+run_example() {
+    local example_dir="$THEMES_DIR/$KEEP_THEME/exampleSite"
+
+    if [ ! -d "$example_dir" ]; then
+        echo "Error: exampleSite not found at $example_dir"
+        exit 1
+    fi
+
+    echo "Starting hugo-bootstrap-gallery exampleSite..."
+    echo "URL: http://localhost:1313/"
+    echo ""
+
+    cd "$example_dir"
+    hugo server --themesDir ../.. --disableFastRender
+}
+
+sync_example() {
+    local example_dir="$THEMES_DIR/$KEEP_THEME/exampleSite"
+    local content_dir="$example_dir/content"
+    local static_dir="$example_dir/static"
+
+    echo "Syncing content from hugo-unified to exampleSite..."
+    echo ""
+
+    # Clear existing content and static (preserve config.toml)
+    echo "Clearing existing content..."
+    rm -rf "$content_dir"
+    rm -rf "$static_dir"
+    mkdir -p "$content_dir"
+    mkdir -p "$static_dir"
+
+    # --- Content sections to sync ---
+    # art--gallery: select a few categories (images as page bundles)
+    echo "Syncing art--gallery (sample categories as page bundles)..."
+    for category in animals monsters landscapes portraits; do
+        if [ -d "$REPO_ROOT/content/art--gallery/$category" ]; then
+            mkdir -p "$content_dir/art--gallery/$category"
+            # Copy index.md
+            cp "$REPO_ROOT/content/art--gallery/$category/index.md" \
+               "$content_dir/art--gallery/$category/" 2>/dev/null || true
+            # Copy images from STATIC into content (page bundles)
+            if [ -d "$REPO_ROOT/static/art--gallery/$category" ]; then
+                find "$REPO_ROOT/static/art--gallery/$category" -maxdepth 1 -type f \
+                    \( -name "*.jpg" -o -name "*.png" -o -name "*.webp" \) | head -12 | \
+                    xargs -I {} cp {} "$content_dir/art--gallery/$category/" 2>/dev/null || true
+            fi
+        fi
+    done
+
+    # emacs: copy recent posts (limit to 10)
+    echo "Syncing emacs posts (10 most recent)..."
+    mkdir -p "$content_dir/emacs"
+    ls -t "$REPO_ROOT/content/emacs"/*.md 2>/dev/null | head -10 | \
+        xargs -I {} cp {} "$content_dir/emacs/" 2>/dev/null || true
+
+    # tags: copy tag index pages
+    echo "Syncing tags..."
+    if [ -d "$REPO_ROOT/content/tags" ]; then
+        cp -r "$REPO_ROOT/content/tags" "$content_dir/"
+    fi
+
+    # Create _index.md for homepage
+    cat > "$content_dir/_index.md" << 'EOF'
+---
+title: "hugo-bootstrap-gallery Demo"
+---
+This is a demo site for the hugo-bootstrap-gallery theme, populated with real content.
+EOF
+
+    # --- Static assets ---
+    echo "Syncing static assets..."
+
+    # Core assets (CSS, JS)
+    if [ -d "$REPO_ROOT/static/assets" ]; then
+        cp -r "$REPO_ROOT/static/assets" "$static_dir/"
+    fi
+
+    # Banner images
+    if [ -d "$REPO_ROOT/static/images" ]; then
+        cp -r "$REPO_ROOT/static/images" "$static_dir/"
+    fi
+
+    # Note: art--gallery images are now in content/ as page bundles (not static/)
+
+    # emacs static images (scan markdown for image references)
+    echo "Syncing emacs images..."
+    mkdir -p "$static_dir/emacs"
+    for md in "$content_dir/emacs"/*.md; do
+        [ -f "$md" ] || continue
+        # Extract image paths from markdown
+        grep -oE '/emacs/[^")]+\.(png|jpg|gif|webp)' "$md" 2>/dev/null | while read img; do
+            imgfile="$REPO_ROOT/static$img"
+            if [ -f "$imgfile" ]; then
+                cp "$imgfile" "$static_dir/emacs/" 2>/dev/null || true
+            fi
+        done
+    done
+
+    # Summary
+    echo ""
+    echo "=== Sync complete ==="
+    echo "Content:"
+    find "$content_dir" -name "*.md" | wc -l | xargs printf "  Markdown files: %d\n"
+    find "$content_dir" -type f \( -name "*.jpg" -o -name "*.png" -o -name "*.webp" \) | wc -l | xargs printf "  Image files: %d\n"
+    echo "Static:"
+    du -sh "$static_dir" 2>/dev/null | cut -f1 | xargs printf "  Total size: %s\n"
+    echo ""
+    echo "Run './scripts/manage-themes.sh example' to preview"
+}
+
 # Main
 case "${1:-}" in
     list)
@@ -203,15 +313,23 @@ case "${1:-}" in
     install-all)
         install_all
         ;;
+    example)
+        run_example
+        ;;
+    sync-example)
+        sync_example
+        ;;
     *)
-        echo "Usage: $0 {list|status|remove-all|install <name>|install-all}"
+        echo "Usage: $0 {list|status|remove-all|install <name>|install-all|sync-example|example}"
         echo ""
         echo "Commands:"
-        echo "  list        - List all available themes with URLs"
-        echo "  status      - Show currently installed themes"
-        echo "  remove-all  - Remove all submodules except $KEEP_THEME"
-        echo "  install     - Install a specific theme by name"
-        echo "  install-all - Install all themes"
+        echo "  list         - List all available themes with URLs"
+        echo "  status       - Show currently installed themes"
+        echo "  remove-all   - Remove all submodules except $KEEP_THEME"
+        echo "  install      - Install a specific theme by name"
+        echo "  install-all  - Install all themes"
+        echo "  sync-example - Sync real content to exampleSite"
+        echo "  example      - Run the hugo-bootstrap-gallery exampleSite"
         exit 1
         ;;
 esac
