@@ -133,7 +133,7 @@ iframe {
 }
 
 .post {
-    background-color: #ffffff88;
+    background-color: #ffffffcc;
     padding: 1em 1em 1em 1em;
 }
 
@@ -200,7 +200,7 @@ iframe {
 }
 
 .article-body {
-    background-color: #ffffff88;
+    background-color: #ffffffcc;
     border-radius: rem;
     border: 0px solid var(--theme-fg);
     padding: 0.5rem 1rem 0rem 1rem;
