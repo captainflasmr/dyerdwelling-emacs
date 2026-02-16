@@ -10,6 +10,1671 @@
 #+exclude_tags: noexport
 #+filetags: :@emacs:@linux:
 
+* DONE Ollama Buddy v2.0 - LLMs can now call Emacs functions! :ollama_buddy:ollama:emacs:2026:
+:PROPERTIES:
+:EXPORT_FILE_NAME: 20260216084213-emacs--ollama-buddy-v2.0---llms-can-now-call-emacs-functions
+:EXPORT_HUGO_SECTION: emacs
+:EXPORT_HUGO_LASTMOD: <2026-02-16 08:56>
+:EXPORT_HUGO_CUSTOM_FRONT_MATTER+: :thumbnail /emacs/20250424085731-emacs--Ollama-Buddy-0-9-35-Grok-Gemini-Integration-Enhanced-Sessions.jpg
+:END:
+
+Tool calling has landed in ollama-buddy!, it's originally not something I really thought I would end up doing, but as ollama has provided tool enabled models and an API for this feature then I felt obliged to add it. So now LLMs through ollama can now actually do things inside Emacs rather than just talk about them, my original "do things only in the chat buffer and copy and paste" might have gone right out the window in an effort to fully support the ollama API!
+
+#+hugo: more
+
+#+attr_org: :width 300px
+#+attr_html: :width 100%
+[[file:static/emacs/20250424085731-emacs--Ollama-Buddy-0-9-35-Grok-Gemini-Integration-Enhanced-Sessions.jpg]]
+
+What is Tool Calling?
+
+The basic idea is simple: instead of the model only generating text, it can request to invoke functions. You ask "what files are in my project?", and instead of guessing, the model calls list_directory, gets the real answer, and responds with actual information.
+
+This creates a conversational loop:
+
+1. You send a prompt
+2. The model decides it needs to call a tool
+3. ollama-buddy executes the tool and feeds the result back
+4. The model generates a response using the real data
+5. Steps 2-4 repeat if more tools are needed
+
+All of this is transparent - you just see the final response in the chat buffer.
+
+The new ollama-buddy-tools.el module ships with 8 built-in tools:
+
+Safe tools (read-only, enabled by default):
+  
+- *read_file* - read file contents
+- *list_directory* - list directory contents
+- *get_buffer_content* - read an Emacs buffer
+- *list_buffers* - list open buffers with optional regex filtering
+- *search_buffer* - regex search within a buffer
+- *calculate* - evaluate math expressions via calc-eval
+
+Unsafe tools (require safe mode off):
+  
+- *write_file* - write content to files
+- *execute_shell* - run shell commands
+
+Safe mode is on by default, so the model can only read - it can't modify anything unless you explicitly allow it, I think this is quite a nice simple implementation, at the moment I generally have safe mode off but always allowing confirmation for each tool action, but of course you can configure as necessary.
+
+*Example Session*
+
+With a tool-capable model like qwen3:8b and tools enabled (C-c W):
+
+*>> PROMPT: What defuns are defined in ollama-buddy-tools.el?*
+
+The model calls *search_buffer* with a regex pattern, gets the list of function definitions, and gives you a nicely formatted summary. No copy-pasting needed.
+
+*Custom Tools*
+
+You can register your own tools with ollama-buddy-tools-register:
+
+#+begin_src 
+  (ollama-buddy-tools-register
+   'my-tool
+   "Description of what the tool does"
+   '((type . "object")
+     (required . ["param1"])
+     (properties . ((param1 . ((type . "string")
+                                (description . "Parameter description"))))))
+   (lambda (args)
+     (let ((param1 (alist-get 'param1 args)))
+       (format "Result: %s" param1)))
+   t)  ; t = safe tool
+#+end_src
+
+The registration API takes a name, description, JSON schema for parameters, an implementation function, and a safety flag. The model sees the schema and decides when to call your tool based on the conversation.
+
+A ⚒ symbol now appears next to tool-capable models everywhere - header line, model selector (C-c m), and model management buffer (C-c M). This follows the same pattern as the existing ⊙ vision indicator, so you can see at a glance which models support tools.
+
+That's it. Pull a tool-capable model (qwen3, llama3.1, mistral, etc.) or use an online tool enabled model from ollama and start chatting. Next up is probably some web searching!, as again the ollama API supports this, so you will be able to pull in the latest from the interwebs to augment your prompt definition!
+
+* TODO GitHub Copilot Meets Emacs: ollama-buddy v1.2 :ollama_buddy:ollama:emacs:2026:
+:PROPERTIES:
+:EXPORT_FILE_NAME: 20260212144000-emacs--GitHub-Copilot-Meets-Emacs-ollama-buddy-v1-2
+:EXPORT_HUGO_SECTION: emacs
+:EXPORT_HUGO_LASTMOD: <2026-02-12 14:40>
+:EXPORT_HUGO_CUSTOM_FRONT_MATTER+: :thumbnail /emacs/20250424085731-emacs--Ollama-Buddy-0-9-35-Grok-Gemini-Integration-Enhanced-Sessions.jpg
+:END:
+
+GitHub Copilot has become a staple tool for many developers, but what if you could access it directly from Emacs alongside your local LLMs? With [[https://github.com/captainflasmr/ollama-buddy][ollama-buddy]] v1.2, that's now possible - and it brings some unique advantages.
+
+#+hugo: more
+
+#+attr_org: :width 300px
+#+attr_html: :width 100%
+[[file:static/emacs/20250424085731-emacs--Ollama-Buddy-0-9-35-Grok-Gemini-Integration-Enhanced-Sessions.jpg]]
+
+** Why Copilot Through ollama-buddy?
+
+You might be thinking: "I already have GitHub Copilot in my editor, why would I want this?" Fair question. Here's what makes this integration special:
+
+*** Access Multiple Premium Models with One Subscription
+
+Your $10/month Copilot subscription doesn't just give you access to GitHub's AI. Through the Copilot Chat API, you get access to:
+
+- *OpenAI models*: gpt-4o, gpt-4.1, gpt-5
+- *Anthropic models*: claude-sonnet-4, claude-opus-4.5
+- *Google models*: gemini-2.5-pro, gemini-3-pro
+- *xAI models*: grok-code-fast-1
+
+That's four different providers' premium models for a single flat fee. If you're already paying for Copilot, this integration gives you much more bang for your buck.
+
+*** Unified Interface
+
+Instead of switching between different tools and interfaces, you have one consistent Emacs-based interface for all your LLM interactions. Whether you're using a local Llama model, Claude via API, or Copilot's gpt-5, the experience is identical.
+
+*** No API Key Juggling
+
+Unlike other providers that require managing API keys in =~/.authinfo= or similar, Copilot uses OAuth device flow. Log in once, and you're done. The authentication token is securely stored and automatically refreshed.
+
+*** Conversation History and Context
+
+Unlike the typical Copilot code completion interface, ollama-buddy gives you full conversation history, file attachments, web search integration, system prompts, and all the other features you use with local models.
+
+** How It Works: OAuth Device Flow
+
+The Copilot integration uses GitHub's OAuth device flow for authentication. This is more secure than API keys and doesn't require you to copy-paste tokens around. Here's the process:
+
+1. Run =M-x ollama-buddy-copilot-login=
+2. Emacs displays a device code (e.g., =ABCD-1234=)
+3. Your browser opens to https://github.com/login/device
+4. Enter the code in your browser
+5. Authorize the application
+6. Return to Emacs - you're now authenticated
+
+Behind the scenes, ollama-buddy:
+- Polls GitHub's API until you complete authorization
+- Receives an access token
+- Stores it in =~/.emacs.d/ollama-buddy-copilot-token.json=
+- Automatically uses it for all Copilot API requests
+- Refreshes the token when needed
+
+You never see or handle the token directly. It just works.
+
+** Setup: Step by Step
+
+*** 1. Ensure You Have an Active Copilot Subscription
+
+You need an active GitHub Copilot subscription ($10/month for individuals, or through GitHub Enterprise). Verify at https://github.com/settings/copilot
+
+*** 2. Load the Copilot Module
+
+Add to your config:
+
+#+begin_src elisp
+(use-package ollama-buddy
+  :bind
+  ("C-c o" . ollama-buddy-role-transient-menu)
+  ("C-c O" . ollama-buddy-transient-menu-wrapper)
+  :config
+  (require 'ollama-buddy-copilot nil t))
+#+end_src
+
+Note: No API key configuration needed!
+
+*** 3. Authenticate
+
+Run the login command:
+
+#+begin_example
+M-x ollama-buddy-copilot-login
+#+end_example
+
+Follow the prompts, enter the device code in your browser, and authorize the application.
+
+*** 4. Select a Copilot Model
+
+Press =C-c m= to select a model. You'll now see Copilot models with the =p:= prefix:
+
+#+begin_example
+Models:
+o:llama3.2
+o:qwen2.5-coder
+a:gpt-4o
+c:claude-sonnet-4
+p:gpt-4o             ← Copilot → OpenAI
+p:gpt-5              ← Copilot → OpenAI  
+p:claude-opus-4.5    ← Copilot → Claude
+p:gemini-2.5-pro     ← Copilot → Gemini
+p:grok-code-fast-1   ← Copilot → xAI
+#+end_example
+
+Select one and start chatting!
+
+** Available Models Through Copilot
+
+The exact model list may evolve, but as of v1.2, Copilot exposes:
+
+*** OpenAI Models
+
+- =p:gpt-4o= - Latest GPT-4 Omni
+- =p:gpt-4.1= - GPT-4 Turbo refresh
+- =p:gpt-5= - Next-generation OpenAI model
+
+*** Anthropic Models
+
+- =p:claude-sonnet-4= - Balanced reasoning and speed
+- =p:claude-opus-4.5= - Maximum capability Claude model
+
+*** Google Models
+
+- =p:gemini-2.5-pro= - Latest Gemini Pro
+- =p:gemini-3-pro= - Next-generation Gemini
+
+*** xAI Models
+
+- =p:grok-code-fast-1= - Code-optimized Grok
+
+The selection gives you flexibility to choose the best model for each task while only paying one subscription fee.
+
+** Feature Compatibility
+
+All ollama-buddy features work with Copilot models:
+
+- ✓ Conversation history
+- ✓ System prompts (global and session-specific)
+- ✓ File attachments
+- ✓ Web search integration
+- ✓ Tone selector
+- ✓ Role presets
+- ✓ Session save/load
+- ✓ Streaming responses
+- ✓ Multishot queries
+
+The only difference is that your requests go through GitHub's Copilot API instead of directly to the model provider or your local Ollama server.
+
+** Example Workflow
+
+Here's how I use Copilot integration in practice:
+
+*** Morning: Code Review with GPT-5
+
+#+begin_example
+C-c m → p:gpt-5
+C-c C-f → attach src/parser.rs
+"Review this code for potential bugs and suggest improvements"
+#+end_example
+
+GPT-5's latest capabilities help catch subtle issues.
+
+*** Midday: Complex Reasoning with Claude Opus
+
+#+begin_example
+C-c m → p:claude-opus-4.5
+"Explain the architectural tradeoffs between these three database designs"
+#+end_example
+
+Claude's deep reasoning excels at architectural analysis.
+
+*** Afternoon: Large Context with Gemini
+
+#+begin_example
+C-c m → p:gemini-2.5-pro
+C-c C-f → attach entire codebase (multiple files)
+"Trace how errors propagate through this system"
+#+end_example
+
+Gemini's massive context window handles large file sets.
+
+*** Evening: Quick Tasks with Local Models
+
+#+begin_example
+C-c m → o:qwen2.5-coder
+"Generate unit tests for this function"
+#+end_example
+
+Switch back to local models for quick, privacy-sensitive tasks.
+
+All within the same interface, same keybindings, same workflow.
+
+** Cost Comparison
+
+Let's compare costs for a developer using multiple premium models:
+
+### Direct API Access
+
+- OpenAI API: $20-50/month (typical usage)
+- Claude API: $20-40/month (typical usage)
+- Gemini API: $10-30/month (typical usage)
+- **Total**: ~$50-120/month
+
+*** Copilot Subscription
+
+- GitHub Copilot: $10/month
+- Includes: gpt-4o, gpt-5, claude-opus-4.5, gemini-2.5-pro, grok
+- **Total**: $10/month
+
+The Copilot route is 5-12× cheaper if you want access to multiple premium models. Of course, there are usage limits (the exact quotas aren't publicly documented), but for typical development workflows, they're quite generous.
+
+** Managing Authentication
+
+The Copilot integration provides these commands:
+
+*** =ollama-buddy-copilot-login=
+
+Initiates OAuth device flow and stores the access token.
+
+*** =ollama-buddy-copilot-logout=
+
+Removes the stored authentication token. You'll need to log in again to use Copilot models.
+
+### =ollama-buddy-copilot-status=
+
+Checks current authentication status:
+
+#+begin_example
+M-x ollama-buddy-copilot-status
+
+Copilot Status:
+Authenticated: Yes
+Token expiry: 2026-03-15 14:22:15
+#+end_example
+
+The token is stored in =~/.emacs.d/ollama-buddy-copilot-token.json= and is automatically refreshed as needed.
+
+** Privacy Considerations
+
+When using Copilot models through ollama-buddy:
+
+- Your prompts are sent to GitHub's Copilot API
+- GitHub may log requests for abuse prevention
+- The content is then forwarded to the underlying model provider (OpenAI, Anthropic, Google, xAI)
+- GitHub's Copilot terms of service and privacy policy apply
+
+This is similar to using Copilot's code completion but with explicit chat interactions. If you're working with sensitive code or data, stick to local Ollama models.
+
+That said, if you're already using Copilot for code completion, using it through ollama-buddy doesn't meaningfully increase your privacy exposure - you're already sending code to GitHub.
+
+** Technical Implementation
+
+For those interested, the Copilot integration:
+
+- Uses GitHub's OAuth device flow (RFC 8628)
+- Implements the Copilot Chat API endpoints
+- Handles streaming responses via server-sent events (SSE)
+- Automatically refreshes expired tokens
+- Follows the same handler pattern as other remote providers
+
+The code is in =ollama-buddy-copilot.el= and follows the same structure as the OpenAI, Claude, Gemini, Grok, and Codestral integrations.
+
+## When NOT to Use Copilot Integration
+
+Copilot through ollama-buddy isn't always the best choice:
+
+*** Skip it if:
+
+- You don't have a Copilot subscription (just use direct APIs or local models)
+- You need guaranteed response times (Copilot can occasionally be slower)
+- You're working with highly sensitive data (use local Ollama models)
+- You want to stay below usage quotas (direct APIs give you more control)
+
+** Configuration Example
+
+Here's a complete config with Copilot and other providers:
+
+#+begin_src elisp
+(use-package ollama-buddy
+  :bind
+  ("C-c o" . ollama-buddy-role-transient-menu)
+  ("C-c O" . ollama-buddy-transient-menu-wrapper)
+  :custom
+  ;; Optional: configure other providers too
+  (ollama-buddy-openai-api-key
+   (auth-source-pick-first-password :host "ollama-buddy-openai" :user "apikey"))
+  (ollama-buddy-claude-api-key
+   (auth-source-pick-first-password :host "ollama-buddy-claude" :user "apikey"))
+  
+  :config
+  ;; Load all providers
+  (require 'ollama-buddy-openai nil t)
+  (require 'ollama-buddy-claude nil t)
+  (require 'ollama-buddy-copilot nil t))  ; No API key needed!
+
+;; Log in to Copilot (run once)
+;; M-x ollama-buddy-copilot-login
+#+end_src
+
+** Troubleshooting
+
+*** "Authentication required" error
+
+Run =M-x ollama-buddy-copilot-login= to authenticate.
+
+*** "Token expired" error
+
+The integration should automatically refresh tokens, but if it fails, run =M-x ollama-buddy-copilot-login= again.
+
+*** Models not appearing
+
+Ensure you have an active Copilot subscription at https://github.com/settings/copilot
+
+*** Browser doesn't open
+
+Manually navigate to https://github.com/login/device and enter the displayed code.
+
+** The Bottom Line
+
+GitHub Copilot integration in ollama-buddy gives you:
+
+1. Access to 4 different premium model providers with one $10/month subscription
+2. A unified Emacs interface for all LLM interactions
+3. OAuth authentication (no API key management)
+4. Full conversation history and context management
+5. All ollama-buddy features (attachments, web search, roles, etc.)
+
+If you already have a Copilot subscription, loading the ollama-buddy integration is a no-brainer. You get access to significantly more capabilities for no additional cost.
+
+And if you don't have Copilot yet but want access to multiple premium models, the $10/month subscription through ollama-buddy might be more economical than paying for multiple direct API subscriptions.
+
+Give it a try and see which of the Copilot-proxied models works best for your workflow!
+
+* TODO Dynamic Role Menus: Context-Aware AI Workflows in ollama-buddy :ollama_buddy:ollama:emacs:2026:
+:PROPERTIES:
+:EXPORT_FILE_NAME: 20260212145000-emacs--Dynamic-Role-Menus-Context-Aware-AI-Workflows
+:EXPORT_HUGO_SECTION: emacs
+:EXPORT_HUGO_LASTMOD: <2026-02-12 14:50>
+:EXPORT_HUGO_CUSTOM_FRONT_MATTER+: :thumbnail /emacs/20250424085731-emacs--Ollama-Buddy-0-9-35-Grok-Gemini-Integration-Enhanced-Sessions.jpg
+:END:
+
+One of [[https://github.com/captainflasmr/ollama-buddy][ollama-buddy]]'s most powerful but least visible features is its role preset system. With v1.5.0, roles got a major upgrade: dynamic transient menus that adapt to your current context, making specialized AI workflows more discoverable and efficient.
+
+#+hugo: more
+
+#+attr_org: :width 300px
+#+attr_html: :width 100%
+[[file:static/emacs/20250424085731-emacs--Ollama-Buddy-0-9-35-Grok-Gemini-Integration-Enhanced-Sessions.jpg]]
+
+** What Are Role Presets?
+
+Role presets are pre-configured AI assistant personalities with specialized commands and system prompts. Instead of one generic "chat with AI" interface, you get tailored experiences for different tasks:
+
+- *Developer* role: Commands for code review, refactoring, debugging, generation
+- *Writer* role: Commands for editing, rewriting, tone adjustment, research
+- *Documenter* role: Commands for READMEs, API docs, changelogs, troubleshooting guides
+- *Tutor* role: Commands for explanations, quizzes, examples, fetching Emacs info documentation
+- *Translator* role: Commands for translating between languages
+- *Buffy* role: Commands for generating Buffy-style quips (yes, really!)
+
+Each role isn't just a different system prompt - it's an entirely different command set optimized for that workflow.
+
+** The Old Way: Flat Minibuffer Menus
+
+Previously, accessing role commands looked like this:
+
+#+begin_example
+[developer role menu]
+a: analyze-code    b: review-code     c: refactor-code    d: debug-code
+e: generate-tests  f: optimize-code   g: explain-code     h: document-code
+i: check-types     j: security-audit  k: add-logging      l: extract-function
+m: inline-function n: generate-docs   o: update-docs      p: write-readme
+q: quit
+#+end_example
+
+It worked, but:
+- Hard to scan visually
+- No grouping of related commands
+- Limited to single-key bindings
+- Couldn't show current state
+- No progressive disclosure
+
+** The New Way: Dynamic Transient Menus
+
+With v1.5.0, the same developer role presents as a rich transient menu:
+
+#+begin_example
+Developer Role Menu
+
+General                  Code Analysis            Code Generation
+o  Open chat             a  Analyze code          g  Generate code
+m  Select model          r  Review code           t  Generate tests
+f  Attach file           d  Debug issue           c  Create boilerplate
+s  Set system prompt     u  Security audit        f  Generate docs
+                         p  Performance check
+Custom                   
+q  Quick question        System
+i  Improve selection     S  Show system prompt
+e  Explain selection     h  Help
+#+end_example
+
+Each group is a logical column. Related commands sit together. Your eye can scan vertically within a category instead of hunting through a flat list.
+
+** How It Works: The =:group= Property
+
+Role presets now support a =:group= property on command definitions:
+
+#+begin_src elisp
+(setq ollama-buddy-command-definitions
+      '((key . "a")
+        (name . "Analyze code")
+        (prompt . "Analyze this code for potential issues")
+        (group . "Code Analysis"))
+       ((key . "r")
+        (name . "Review code")
+        (prompt . "Perform a detailed code review")
+        (group . "Code Analysis"))
+       ((key . "g")
+        (name . "Generate code")
+        (prompt . "Generate code based on the description")
+        (group . "Code Generation"))
+       ;; ...more commands
+       ))
+#+end_src
+
+When you open the role menu (=C-c o=), ollama-buddy:
+1. Groups commands by their =:group= property
+2. Creates one transient column per group
+3. Generates key bindings automatically
+4. Displays model assignments (if commands specify =:model=)
+5. Shows current context (files attached, web searches, etc.)
+
+Commands without a =:group= property fall into a default "Commands" column for backwards compatibility.
+
+** Built-In Role Presets
+
+ollama-buddy ships with several sophisticated role presets:
+
+*** Developer Role
+
+#+begin_example
+General | Code Analysis | Code Generation | Custom | System
+#+end_example
+
+Groups:
+- *General*: Chat, model selection, file attachment, system prompts
+- *Code Analysis*: Analyze, review, debug, security audit, performance check
+- *Code Generation*: Generate code, tests, boilerplate, documentation
+- *Custom*: Quick questions, improve selection, explain selection
+- *System*: Show system prompt, help
+
+Perfect for daily coding workflows.
+
+*** Writer Role
+
+#+begin_example
+General | Writing | Editorial | Creative | Analysis | Research | Utility | System
+#+end_example
+
+Groups:
+- *Writing*: Continue writing, expand, shorten, rewrite
+- *Editorial*: Grammar check, improve clarity, tone adjustment
+- *Creative*: Alternative versions, different styles
+- *Analysis*: Analyze text, extract key points
+- *Research*: Fact checking, find sources
+- *Utility*: Summarize, translate
+- *System*: System prompts, help
+
+Comprehensive writing assistance.
+
+*** Documenter Role
+
+#+begin_example
+General | Overview | Code Docs | Release | Support | Improve | System
+#+end_example
+
+Groups:
+- *Overview*: Write README, quick start guide, architecture docs
+- *Code Docs*: Add comments, write docstrings, API documentation, usage examples
+- *Release*: Changelog entry, release notes
+- *Support*: Troubleshooting guide, FAQ
+- *Improve*: Improve existing docs, simplify language
+- *System*: System prompts, help
+
+Everything documentation-related.
+
+*** Tutor Role
+
+#+begin_example
+General | Info Docs | Explanation | Assessment | Context | System
+#+end_example
+
+Groups:
+- *General*: Open chat, model selection
+- *Info Docs*: Browse and fetch Emacs info documentation
+- *Explanation*: Explain simply, explain deeply, ELI5, analogy, step-by-step
+- *Assessment*: Quiz me, check understanding, practice problems
+- *Context*: Prerequisites, related topics, real-world examples, common mistakes
+- *System*: System prompts, help
+
+Learning-focused commands with special Emacs info integration.
+
+*** Translator Role
+
+#+begin_example
+General | Languages | Tools | System
+#+end_example
+
+Groups:
+- *Languages*: Translate to/from English, Spanish, French, German, Japanese, Chinese
+- *Tools*: Detect language, explain idioms, cultural context
+- *System*: System prompts, help
+
+Language translation and cultural context.
+
+*** Buffy Role
+
+#+begin_example
+General | Characters | Supernatural | System
+#+end_example
+
+Groups:
+- *Characters*: Buffy quip, Willow explain, Xander joke, Giles knowledge
+- *Supernatural*: Demon fact, slayer wisdom, magic spell description
+- *System*: System prompts, help
+
+A fun example showing how roles can create themed interactions!
+
+** Creating Custom Roles
+
+Creating your own role is straightforward. Create a file in =~/.emacs.d/ollama-buddy-roles/=:
+
+#+begin_src elisp
+;; my-data-scientist-role.el
+
+(setq ollama-buddy-menu-columns 3)  ; Optional: set column count
+
+(setq ollama-buddy-command-definitions
+      '(;; Data Analysis group
+        ((key . "a") (name . "Analyze dataset") 
+         (prompt . "Analyze this dataset and provide insights")
+         (group . "Data Analysis"))
+        ((key . "v") (name . "Visualize data")
+         (prompt . "Suggest visualizations for this data")
+         (group . "Data Analysis"))
+        ((key . "c") (name . "Clean data")
+         (prompt . "Suggest data cleaning steps")
+         (group . "Data Analysis"))
+        
+        ;; ML Model group
+        ((key . "m") (name . "Model selection")
+         (prompt . "Recommend ML models for this problem")
+         (group . "ML Model"))
+        ((key . "t") (name . "Train model")
+         (prompt . "Generate training code for this model")
+         (group . "ML Model"))
+        ((key . "e") (name . "Evaluate model")
+         (prompt . "Suggest model evaluation metrics")
+         (group . "ML Model"))
+        
+        ;; Statistical group
+        ((key . "s") (name . "Statistical test")
+         (prompt . "Recommend appropriate statistical test")
+         (group . "Statistical"))
+        ((key . "h") (name . "Hypothesis test")
+         (prompt . "Design hypothesis test for this scenario")
+         (group . "Statistical"))
+        
+        ;; System commands
+        ((key . "o") (name . "Open chat")
+         (action . ollama-buddy))
+        ((key . "q") (name . "Quit")
+         (action . quit))))
+#+end_src
+
+Load it with =M-x ollama-buddy-roles-switch-role=, and you get a custom-tailored data science assistant with organized commands.
+
+** Using the Role Menu
+
+The recommended binding is:
+
+#+begin_src elisp
+(use-package ollama-buddy
+  :bind
+  ("C-c o" . ollama-buddy-role-transient-menu)   ; Role menu
+  ("C-c O" . ollama-buddy-transient-menu-wrapper)) ; Main transient
+#+end_src
+
+Now:
+- =C-c o= opens the current role's command menu
+- =C-c O= opens the main ollama-buddy transient menu
+
+From the main menu, press =b= to switch between role menus.
+
+In the chat buffer, =C-c b= also opens the role menu.
+
+** Model Assignment in Roles
+
+Commands can specify which model they work best with:
+
+#+begin_src elisp
+((key . "r")
+ (name . "Refactor code")
+ (prompt . "Refactor this code for better readability")
+ (model . "o:qwen2.5-coder")
+ (group . "Code Generation"))
+#+end_src
+
+When you select this command, ollama-buddy:
+1. Switches to the specified model automatically
+2. Shows the model name in the transient menu: "Refactor code (qwen2.5-coder)"
+3. Executes the command with that model
+
+This lets you optimize each command for the best model, without manually switching every time.
+
+** Progressive Disclosure
+
+The transient menu supports progressive disclosure. Start with high-level groups, then drill down:
+
+#+begin_example
+Main Menu → b (Roles) → Developer Role → Code Analysis → a (Analyze code)
+#+end_example
+
+Each level reveals more specific options. This makes large command sets manageable without overwhelming the user.
+
+** Backwards Compatibility
+
+Old role presets without =:group= properties still work perfectly. All commands appear in a single "Commands" column, matching the previous flat layout. This ensures existing custom roles don't break.
+
+To upgrade an old role, simply add =:group= properties:
+
+#+begin_src elisp
+;; Old way (still works)
+((key . "a") (name . "Analyze") (prompt . "..."))
+
+;; New way (adds grouping)
+((key . "a") (name . "Analyze") (prompt . "...") (group . "Analysis"))
+#+end_src
+
+** Configuration Example
+
+Here's a complete setup using role menus:
+
+#+begin_src elisp
+(use-package ollama-buddy
+  :bind
+  ("C-c o" . ollama-buddy-role-transient-menu)
+  ("C-c O" . ollama-buddy-transient-menu-wrapper)
+  :custom
+  ;; Set default role
+  (ollama-buddy-roles-directory "~/.emacs.d/ollama-buddy-roles/")
+  
+  :config
+  ;; Load a default role on startup
+  (ollama-buddy-roles-switch-role "developer"))
+#+end_src
+
+## Real-World Workflow
+
+Here's how I use role menus daily:
+
+*** Morning: Code review
+
+#+begin_example
+C-c o → r (review code)
+[Select files with ollama-dired integration]
+AI reviews code with developer-specific prompts
+#+end_example
+
+*** Midday: Writing documentation
+
+#+begin_example
+M-x ollama-buddy-roles-switch-role → documenter
+C-c o → w (write README)
+AI generates comprehensive project documentation
+#+end_example
+
+*** Afternoon: Learning new Emacs features
+
+#+begin_example
+M-x ollama-buddy-roles-switch-role → tutor
+C-c o → I (Fetch info node)
+Select "(elisp)Hooks"
+C-c o → s (explain simply)
+AI explains hooks concept with examples
+#+end_example
+
+*** Evening: Fun with Buffy quips
+
+#+begin_example
+M-x ollama-buddy-roles-switch-role → buffy
+C-c o → b (Buffy quip)
+"Debugging this code again? That's my life story, just with more stakes."
+#+end_example
+
+Different contexts, different roles, seamless transitions.
+
+** The Role Creator
+
+ollama-buddy includes a role creator assistant (=M-x ollama-buddy-role-creator-create-new-role=) that guides you through building custom roles:
+
+1. Prompts for role name
+2. Asks for number of menu columns
+3. Guides you through defining commands
+4. Asks for group names
+5. Saves the complete role file
+
+It's a great way to quickly prototype new role presets without hand-writing all the elisp structure.
+
+** Future Enhancements
+
+Planned improvements for role menus:
+
+- Visual themes per role (color-coded groups)
+- Conditional command visibility (show/hide based on context)
+- Role-specific keybindings in chat buffer
+- Shared command library across roles
+- Import/export role presets
+
+The role system is designed to be extensible - as your AI workflows evolve, your roles can evolve with them.
+
+** The Bottom Line
+
+Dynamic role menus in ollama-buddy v1.5.0 transform specialized AI interactions from a flat list of commands into organized, discoverable, context-aware interfaces. Whether you're coding, writing, documenting, learning, or just having fun, there's a role preset that makes your workflow smoother.
+
+And if there isn't, you can create one in minutes!
+
+Try switching between a few built-in roles (=M-x ollama-buddy-roles-switch-role=) to see how the same AI assistant can present completely different personalities and capabilities based on your current task.
+
+* TODO Enhancing ollama-buddy's UI: Smart System Prompts and Visual Feedback :ollama_buddy:ollama:emacs:2026:
+:PROPERTIES:
+:EXPORT_FILE_NAME: 20260212140000-emacs--Enhancing-ollama-buddys-UI-Smart-System-Prompts-and-Visual-Feedback
+:EXPORT_HUGO_SECTION: emacs
+:EXPORT_HUGO_LASTMOD: <2026-02-12 14:00>
+:EXPORT_HUGO_CUSTOM_FRONT_MATTER+: :thumbnail /emacs/20250424085731-emacs--Ollama-Buddy-0-9-35-Grok-Gemini-Integration-Enhanced-Sessions.jpg
+:END:
+
+Over the past few weeks, I've been refining the user experience in [[https://github.com/captainflasmr/ollama-buddy][ollama-buddy]] with a series of small but impactful UI improvements. While individually these might seem minor, together they create a much smoother and more informative interaction with your local LLMs.
+
+#+hugo: more
+
+#+attr_org: :width 300px
+#+attr_html: :width 100%
+[[file:static/emacs/20250424085731-emacs--Ollama-Buddy-0-9-35-Grok-Gemini-Integration-Enhanced-Sessions.jpg]]
+
+** Global System Prompts: Consistency Across Providers
+
+One persistent annoyance I encountered was inconsistent response formatting across different LLM providers. Claude might give you clean prose, while another model insists on wrapping everything in markdown tables. Some models love code blocks, others prefer bullet points.
+
+The solution? A *global system prompt* that establishes baseline formatting rules before any session-specific instructions:
+
+#+begin_src elisp
+(setq ollama-buddy-global-system-prompt
+      "Please provide responses in clear, readable plain text. 
+       Avoid markdown tables unless explicitly requested. 
+       Use simple formatting with paragraphs and bullet points.")
+#+end_src
+
+This prompt is automatically prepended to every request, regardless of which model or provider you're using. The result is much more consistent output formatting, especially helpful when you're switching between local Ollama models and cloud providers like OpenAI or Claude.
+
+The feature is enabled by default (=ollama-buddy-global-system-prompt-enabled=), but you can toggle it on the fly with =ollama-buddy-toggle-global-system-prompt= or via the transient menu. When disabled, a =<= indicator appears in the header line so you always know the current state.
+
+** Visual Attachment Indicators
+
+Before this update, it was easy to forget that you had files or web searches attached to your session context. You might send a prompt and wonder why the response seemed oddly specific, or worse, you might accidentally include sensitive files in a query.
+
+Now the header line displays clear visual indicators:
+
+- =📎3= - You have 3 files attached
+- =🔍2= - You have 2 web search results attached  
+- =📎2🔍1= - Both files and searches are active
+
+These indicators are always visible, giving you constant awareness of what context you're sending to the LLM. A small change, but it prevents a lot of "wait, why did it respond that way?" moments.
+
+** Pulse Responses: Visual Completion Feedback
+
+When I disabled auto-scrolling (more on that below), I discovered a problem: if I was reading earlier parts of a long conversation while a new response streamed in, I had no clear indication when the streaming completed.
+
+The solution was inspired by =gptel= - when a response finishes streaming, the entire response text briefly pulses or flashes. It's a subtle visual cue that draws your eye without being intrusive.
+
+You can control this with =ollama-buddy-pulse-response= (default: =t=). Combined with manual scrolling, it creates a much more comfortable reading experience for longer conversations.
+
+** Auto-Scroll Control
+
+Speaking of scrolling, the package now gives you control over auto-scroll behaviour via =ollama-buddy-auto-scroll= (default: =nil=).
+
+When disabled, your cursor stays put during streaming responses. This lets you:
+- Re-read earlier parts of the conversation
+- Copy text from previous responses
+- Review your own prompts
+- Generally maintain your place in longer chats
+
+When enabled, the buffer auto-scrolls to follow new output as it arrives - the previous behaviour.
+
+The pulse response feature pairs perfectly with manual scrolling, giving you the best of both worlds: freedom to read anywhere in the buffer, with clear visual feedback when new content finishes arriving.
+
+** Simplified Model Management
+
+The model management interface received some streamlining:
+
+- Consolidated into a single unified buffer (=C-c M=)
+- Actions section (Import GGUF, Refresh, Custom Pull) moved to the top for easier access
+- Unload All now refreshes the model list automatically after completion
+- Clearer labelling: "Pull Model from Hub" became "Custom Pull Model"
+
+These changes make common model management tasks more discoverable and efficient.
+
+** Putting It All Together
+
+Here's what a typical ollama-buddy session looks like with these improvements:
+
+1. Open a chat buffer and glance at the header line - you immediately see which model you're using, whether global prompts are enabled, and if you have any attachments
+2. Attach a couple of files with =C-c C-f= - the =📎2= indicator appears
+3. Type a prompt and send it with =C-c C-c=
+4. While the response streams in, scroll up to re-read an earlier exchange
+5. The response finishes with a subtle pulse - you scroll down to read it
+6. Throughout the session, consistent formatting makes all responses easy to read
+
+None of these changes are revolutionary on their own, but together they significantly reduce cognitive load. You spend less time thinking about the interface and more time focusing on your actual work with the LLMs.
+
+** Configuration Example
+
+Here's how I have these features configured:
+
+#+begin_src elisp
+(use-package ollama-buddy
+  :bind
+  ("C-c o" . ollama-buddy-role-transient-menu)
+  ("C-c O" . ollama-buddy-transient-menu-wrapper)
+  :custom
+  ;; Global system prompt for consistency
+  (ollama-buddy-global-system-prompt-enabled t)
+  (ollama-buddy-global-system-prompt
+   "Provide clear, plain text responses. Avoid markdown tables unless requested.")
+  
+  ;; Comfortable reading experience
+  (ollama-buddy-auto-scroll nil)
+  (ollama-buddy-pulse-response t))
+#+end_src
+
+These UI refinements ship in ollama-buddy v1.1.3 through v1.1.5. They represent my ongoing effort to make local LLM interaction in Emacs as smooth and intuitive as possible.
+
+Sometimes the best improvements are the small ones that remove tiny friction points from your daily workflow!
+
+* TODO Tone Selector for Response Styles in ollama-buddy :ollama_buddy:ollama:emacs:2026:
+:PROPERTIES:
+:EXPORT_FILE_NAME: 20260212141000-emacs--Tone-Selector-for-Response-Styles-in-ollama-buddy
+:EXPORT_HUGO_SECTION: emacs
+:EXPORT_HUGO_LASTMOD: <2026-02-12 14:10>
+:EXPORT_HUGO_CUSTOM_FRONT_MATTER+: :thumbnail /emacs/20250424085731-emacs--Ollama-Buddy-0-9-35-Grok-Gemini-Integration-Enhanced-Sessions.jpg
+:END:
+
+Have you ever wished your AI assistant could switch between being concise and being thorough without editing complex system prompts? The new tone selector in [[https://github.com/captainflasmr/ollama-buddy][ollama-buddy]] v1.4.0 makes this trivial.
+
+#+hugo: more
+
+#+attr_org: :width 300px
+#+attr_html: :width 100%
+[[file:static/emacs/20250424085731-emacs--Ollama-Buddy-0-9-35-Grok-Gemini-Integration-Enhanced-Sessions.jpg]]
+
+** The Problem
+
+Different contexts call for different response styles. When you're exploring a new concept, you want thorough explanations with examples. When you're debugging production code at 2am, you want direct, actionable answers. When you're writing documentation, you want a formal, precise tone.
+
+Previously, achieving these different styles meant manually crafting system prompts for each scenario or maintaining multiple role presets. The tone selector eliminates this friction.
+
+** How It Works
+
+The tone selector provides five built-in response styles:
+
+- *Normal* - Default behaviour, no modifications
+- *Concise* - Short, direct answers without elaboration
+- *Learning* - Thorough explanations with context and examples
+- *Explanatory* - Detailed reasoning broken down step-by-step
+- *Formal* - Professional, precise, structured responses
+
+To change tone, press =C-c ~= in the chat buffer (or use =~= in the transient menu). You'll get a clean completing-read interface:
+
+#+begin_example
+Tone (current: Normal): 
+[Normal, Concise, Learning, Explanatory, Formal]
+#+end_example
+
+Select your preferred tone, and it immediately affects all subsequent prompts. The header line displays a compact indicator when a non-default tone is active:
+
+- =~C= - Concise mode active
+- =~L= - Learning mode active
+- =~E= - Explanatory mode active
+- =~F= - Formal mode active
+
+** Under the Hood
+
+The tone selector works by prepending modifier text to your system prompt. When you select "Concise", for example, ollama-buddy adds this instruction before your global and session-specific prompts:
+
+#+begin_src
+Be concise and direct. Give short, focused answers without unnecessary elaboration.
+#+end_src
+
+This layered approach means your tone preference works consistently across:
+- All LLM providers (local Ollama, OpenAI, Claude, Gemini, Grok, Copilot, Codestral)
+- All role presets (developer, writer, tutor, etc.)
+- All session types (new chats, loaded sessions, multishot queries)
+
+The tone text is always applied first, followed by the global system prompt, then your session-specific prompt. This ensures tone instructions take precedence while preserving your other configuration.
+
+** Real-World Examples
+
+Let's see how the same question gets different responses based on tone:
+
+*Question:* "Explain how recursion works"
+
+*Concise tone:*
+#+begin_example
+Recursion is when a function calls itself to solve a problem. 
+Each call works on a smaller piece until reaching a base case.
+Example: factorial(5) calls factorial(4), which calls factorial(3), etc.
+#+end_example
+
+*Learning tone:*
+#+begin_example
+Recursion is a powerful programming concept where a function solves a problem 
+by calling itself with modified parameters. Think of it like Russian nesting dolls - 
+each doll contains a smaller version of itself.
+
+The key components are:
+1. Base case - tells the function when to stop
+2. Recursive case - breaks the problem into smaller pieces
+
+Let's look at a practical example with factorial calculation...
+[continues with detailed walkthrough]
+#+end_example
+
+*Formal tone:*
+#+begin_example
+Recursion is a computational technique wherein a function invokes itself 
+to decompose a complex problem into simpler, self-similar subproblems. 
+
+The recursive approach requires two fundamental components:
+1. A termination condition (base case) that prevents infinite recursion
+2. A reduction step that transforms the problem toward the base case
+
+Formally, a recursive function f can be defined as...
+#+end_example
+
+Same question, three completely different response styles, all achieved with a single keypress.
+
+** Customizing Tones
+
+The built-in tones cover most use cases, but you can easily customize them or add your own:
+
+#+begin_src elisp
+(setq ollama-buddy-tone-alist
+      '(("Normal" . "")
+        ("Concise" . "Be extremely brief. Maximum 3 sentences per answer.")
+        ("Learning" . "Explain thoroughly as if teaching. Include context, examples and analogies.")
+        ("Explanatory" . "Provide detailed explanations with reasoning. Break down complex topics.")
+        ("Formal" . "Use formal, academic tone. Be precise and structured.")
+        ;; Add your own
+        ("Debug" . "Focus on identifying and fixing issues. Provide actionable solutions.")
+        ("Creative" . "Be imaginative and explore unconventional approaches.")))
+#+end_src
+
+Your custom tones will appear in the tone selector alongside the built-in options.
+
+** Workflow Integration
+
+I find myself using different tones throughout the day:
+
+*Morning code review:*
+#+begin_example
+C-c ~  [Concise]
+"What does this function do?"
+"Why is this test failing?"
+#+end_example
+
+*Afternoon research:*
+#+begin_example
+C-c ~  [Learning]
+"How does Rust's ownership system work?"
+"Explain database indexing strategies"
+#+end_example
+
+*Evening documentation:*
+#+begin_example
+C-c ~  [Formal]
+"Generate API documentation for this module"
+"Describe the architecture of this system"
+#+end_example
+
+The tone persists within a session, so you're not constantly re-selecting it. But it's quick to change when you need a different style.
+
+** Technical Implementation
+
+The tone selector is remarkably simple under the hood:
+
+#+begin_src elisp
+(defcustom ollama-buddy-tone-alist
+  '(("Normal" . "")
+    ("Concise" . "Be concise and direct. Give short, focused answers.")
+    ("Learning" . "Explain thoroughly as if teaching. Include context and examples.")
+    ("Explanatory" . "Provide detailed explanations with reasoning.")
+    ("Formal" . "Use a formal, professional tone. Be precise and structured."))
+  "Alist mapping tone names to system prompt modifier strings."
+  :type '(alist :key-type string :value-type string)
+  :group 'ollama-buddy)
+
+(defun ollama-buddy-set-tone ()
+  "Select response tone from predefined options."
+  (interactive)
+  (let* ((current (or ollama-buddy--current-tone "Normal"))
+         (tones (mapcar #'car ollama-buddy-tone-alist))
+         (tone (completing-read 
+                (format "Tone (current: %s): " current)
+                tones nil t nil nil current)))
+    (setq ollama-buddy--current-tone tone)
+    (message "Response tone set to: %s" tone)))
+#+end_src
+
+The selected tone is stored in =ollama-buddy--current-tone= and prepended to the system prompt when building requests. Clean, simple, effective.
+
+** Configuration
+
+Add this to your config to set a default tone:
+
+#+begin_src elisp
+(use-package ollama-buddy
+  :bind
+  ("C-c o" . ollama-buddy-role-transient-menu)
+  ("C-c O" . ollama-buddy-transient-menu-wrapper)
+  :custom
+  ;; Set default tone (defaults to "Normal" if not specified)
+  (ollama-buddy-tone-alist
+   '(("Normal" . "")
+     ("Concise" . "Be brief and direct.")
+     ("Learning" . "Explain thoroughly with examples.")
+     ("Explanatory" . "Provide detailed step-by-step reasoning.")
+     ("Formal" . "Use formal, professional language."))))
+#+end_src
+
+The tone selector is available in ollama-buddy v1.4.0 and later. It's one of those features that seems simple but makes a real difference in daily usage - being able to quickly adapt your LLM's communication style to match your current needs is surprisingly powerful.
+
+Give it a try next time you find yourself wanting different response styles from your AI assistant!
+
+* TODO Managing Multiple AI Providers in Emacs with ollama-buddy :ollama_buddy:ollama:emacs:2026:
+:PROPERTIES:
+:EXPORT_FILE_NAME: 20260212143000-emacs--Managing-Multiple-AI-Providers-in-Emacs
+:EXPORT_HUGO_SECTION: emacs
+:EXPORT_HUGO_LASTMOD: <2026-02-12 14:30>
+:EXPORT_HUGO_CUSTOM_FRONT_MATTER+: :thumbnail /emacs/20250424085731-emacs--Ollama-Buddy-0-9-35-Grok-Gemini-Integration-Enhanced-Sessions.jpg
+:END:
+
+One of [[https://github.com/captainflasmr/ollama-buddy][ollama-buddy]]'s most powerful features is its seamless support for multiple LLM providers. You can start a conversation with a local Llama model, switch to Claude for complex reasoning, and then use OpenAI's latest model - all within the same Emacs interface without changing your workflow.
+
+#+hugo: more
+
+#+attr_org: :width 300px
+#+attr_html: :width 100%
+[[file:static/emacs/20250424085731-emacs--Ollama-Buddy-0-9-35-Grok-Gemini-Integration-Enhanced-Sessions.jpg]]
+
+** The Seven Provider Ecosystem
+
+ollama-buddy currently supports seven different LLM providers:
+
+*** Local Ollama Models
+
+- Prefix: =o:= (or no prefix when used alone)
+- Examples: =o:llama3.2=, =o:qwen2.5-coder=, =o:mistral=
+- Privacy: Complete - all inference happens locally
+- Cost: Free after initial GPU investment
+- Speed: Fast - no network latency
+- Context: Varies by model (typically 8K-128K tokens)
+
+*** OpenAI
+
+- Prefix: =a:=
+- Examples: =a:gpt-4o=, =a:gpt-4.1=, =a:gpt-5=
+- Privacy: Low - prompts sent to OpenAI
+- Cost: Pay-per-token
+- Speed: Fast API responses
+- Context: Up to 128K tokens
+- Best for: Latest model capabilities, large context windows
+
+*** Anthropic Claude
+
+- Prefix: =c:=
+- Examples: =c:claude-sonnet-4=, =c:claude-opus-4.5=
+- Privacy: Low - prompts sent to Anthropic
+- Cost: Pay-per-token
+- Speed: Fast API responses
+- Context: Up to 200K tokens
+- Best for: Complex reasoning, analysis, long-form writing
+
+*** Google Gemini
+
+- Prefix: =g:=
+- Examples: =g:gemini-2.5-pro=, =g:gemini-3-pro=
+- Privacy: Low - prompts sent to Google
+- Cost: Pay-per-token
+- Speed: Fast API responses
+- Context: Up to 2M tokens
+- Best for: Massive context windows, multimodal tasks
+
+### X Grok
+
+- Prefix: =k:=
+- Examples: =k:grok-code-fast-1=
+- Privacy: Low - prompts sent to X.AI
+- Cost: Pay-per-token
+- Speed: Fast API responses
+- Context: Varies by model
+- Best for: Code generation, reasoning
+
+*** GitHub Copilot
+
+- Prefix: =p:=
+- Examples: =p:gpt-4o=, =p:claude-opus-4.5=, =p:gemini-2.5-pro=
+- Privacy: Low - prompts sent through GitHub
+- Cost: Flat subscription ($10/month)
+- Speed: Fast API responses
+- Context: Depends on underlying model
+- Best for: Access to multiple providers with one subscription
+- Unique: OAuth authentication, no API key needed
+
+*** Mistral Codestral
+
+- Prefix: =s:=
+- Examples: =s:codestral-latest=
+- Privacy: Low - prompts sent to Mistral
+- Cost: Pay-per-token
+- Speed: Fast API responses  
+- Context: Varies by model
+- Best for: Code generation and analysis
+
+** The Prefix System
+
+The prefix system is ollama-buddy's elegant solution for namespace management. Instead of complex configuration or separate interfaces, you just prepend a provider identifier:
+
+#+begin_example
+C-c m    (select model)
+
+Models:
+o:llama3.2             (local Ollama)
+o:qwen2.5-coder       (local Ollama)
+a:gpt-4o              (OpenAI)
+c:claude-sonnet-4     (Claude)
+g:gemini-2.5-pro      (Gemini)
+k:grok-code-fast-1    (Grok)
+p:gpt-5               (Copilot → OpenAI)
+s:codestral-latest    (Codestral)
+#+end_example
+
+The prefix tells ollama-buddy which backend to route the request through. All other functionality - system prompts, attachments, history, sessions - works identically across providers.
+
+When using only local Ollama models, prefixes can be omitted for cleaner model names.
+
+** Reading the Status Line
+
+The header line provides compact indicators showing which providers are currently loaded:
+
+#+begin_example
+[llama3.2] acgkps 📎2 🔍1
+#+end_example
+
+This tells you:
+
+- Current model: =llama3.2= (local Ollama)
+- =a= - OpenAI provider loaded
+- =c= - Claude provider loaded
+- =g= - Gemini provider loaded
+- =k= - Grok provider loaded
+- =p= - Copilot provider loaded
+- =s= - Codestral provider loaded
+- =📎2= - Two files attached
+- =🔍1= - One web search attached
+
+The provider indicators only appear when you've loaded those modules in your config. This keeps the status line clean when using only local models.
+
+** When to Use Which Provider
+
+Each provider has its strengths. Here's my decision framework:
+
+*** Use Local Ollama When:
+
+- Privacy is important (sensitive code, proprietary data)
+- You want zero recurring costs
+- Network connectivity is limited or unreliable
+- You need fast, low-latency responses
+- You're experimenting and iterating rapidly
+- The task doesn't require cutting-edge capabilities
+
+Example: Refactoring local code, writing tests, quick Q&A
+
+*** Use OpenAI When:
+
+- You need the absolute latest model capabilities
+- Task requires strong general reasoning
+- You want reliable, consistent quality
+- Large context windows are needed (128K)
+
+Example: Complex code generation, architectural decisions
+
+*** Use Claude When:
+
+- Task requires deep reasoning or analysis
+- You're working with complex, ambiguous problems
+- You need very long-form outputs
+- Context understanding is critical (200K context)
+
+Example: Analyzing large codebases, technical writing, complex debugging
+
+*** Use Gemini When:
+
+- You need massive context windows (2M tokens)
+- Working with extremely long documents
+- Multimodal tasks (though ollama-buddy doesn't fully expose this yet)
+
+Example: Analyzing entire repositories, processing large datasets
+
+*** Use Grok When:
+
+- You need fast code generation
+- Working on performance-critical reasoning tasks
+- Want access to X.AI's models
+
+Example: Quick coding tasks, algorithmic problems
+
+### Use Copilot When:
+
+- You already have a Copilot subscription
+- You want access to multiple providers (OpenAI, Claude, Gemini) with one subscription
+- You prefer OAuth over API key management
+- Cost predictability matters (flat $10/month vs pay-per-token)
+
+Example: General development work, accessing premium models economically
+
+*** Use Codestral When:
+
+- Task is specifically code-focused
+- You want Mistral's code generation capabilities
+- Working on code analysis or refactoring
+
+Example: Code review, generating boilerplate, code translation
+
+** Configuration
+
+Here's a complete multi-provider setup:
+
+#+begin_src elisp
+(use-package ollama-buddy
+  :bind
+  ("C-c o" . ollama-buddy-role-transient-menu)
+  ("C-c O" . ollama-buddy-transient-menu-wrapper)
+  :custom
+  ;; OpenAI
+  (ollama-buddy-openai-api-key
+   (auth-source-pick-first-password :host "ollama-buddy-openai" :user "apikey"))
+  
+  ;; Claude
+  (ollama-buddy-claude-api-key
+   (auth-source-pick-first-password :host "ollama-buddy-claude" :user "apikey"))
+  
+  ;; Gemini
+  (ollama-buddy-gemini-api-key
+   (auth-source-pick-first-password :host "ollama-buddy-gemini" :user "apikey"))
+  
+  ;; Grok
+  (ollama-buddy-grok-api-key
+   (auth-source-pick-first-password :host "ollama-buddy-grok" :user "apikey"))
+  
+  ;; Codestral
+  (ollama-buddy-codestral-api-key
+   (auth-source-pick-first-password :host "ollama-buddy-codestral" :user "apikey"))
+  
+  :config
+  ;; Load provider modules
+  (require 'ollama-buddy-openai nil t)
+  (require 'ollama-buddy-claude nil t)
+  (require 'ollama-buddy-gemini nil t)
+  (require 'ollama-buddy-grok nil t)
+  (require 'ollama-buddy-copilot nil t)  ;; Uses OAuth, no API key needed
+  (require 'ollama-buddy-codestral nil t))
+#+end_src
+
+For Copilot, run =M-x ollama-buddy-copilot-login= instead of configuring an API key.
+
+** Switching Providers Mid-Conversation
+
+One powerful workflow is switching providers within a single conversation:
+
+#+begin_example
+[Using o:llama3.2]
+You: Write a function to parse JSON
+
+* TODO Web Search Integration in ollama-buddy: Bringing Context to Your AI Conversations :ollama_buddy:ollama:emacs:2026:
+:PROPERTIES:
+:EXPORT_FILE_NAME: 20260212142000-emacs--Web-Search-Integration-in-ollama-buddy
+:EXPORT_HUGO_SECTION: emacs
+:EXPORT_HUGO_LASTMOD: <2026-02-12 14:20>
+:EXPORT_HUGO_CUSTOM_FRONT_MATTER+: :thumbnail /emacs/20250424085731-emacs--Ollama-Buddy-0-9-35-Grok-Gemini-Integration-Enhanced-Sessions.jpg
+:END:
+
+One of the fundamental limitations of local LLMs is their knowledge cutoff - they don't know about anything that happened after their training data ended. The new web search integration in [[https://github.com/captainflasmr/ollama-buddy][ollama-buddy]] v1.3.0 solves this elegantly by fetching current information from the web and injecting it into your conversation context.
+
+#+hugo: more
+
+#+attr_org: :width 300px
+#+attr_html: :width 100%
+[[file:static/emacs/20250424085731-emacs--Ollama-Buddy-0-9-35-Grok-Gemini-Integration-Enhanced-Sessions.jpg]]
+
+** The Knowledge Gap Problem
+
+Your local Llama model is brilliant at reasoning, coding, and analysis. But ask it about:
+
+- Current events ("What happened in the news today?")
+- Recent software releases ("What's new in Emacs 30?")
+- Up-to-date documentation ("How do I use the latest React hooks?")
+- Real-time information ("What's the current exchange rate?")
+
+...and you'll get either an honest "I don't know" or worse, confidently incorrect information based on outdated training data.
+
+Web search integration solves this by letting your LLM access current information while maintaining the privacy and control benefits of local inference.
+
+** How It Works: The Pipeline
+
+The web search feature implements a multi-stage pipeline that transforms search queries into clean, LLM-friendly context:
+
+*** Stage 1: Query to Ollama API
+
+Your search query is sent to Ollama's Web Search API:
+
+#+begin_src elisp
+POST https://ollama.com/api/web_search
+Authorization: Bearer YOUR_API_KEY
+Content-Type: application/json
+
+{"query": "Emacs 30 new features"}
+#+end_src
+
+The API returns structured search results with URLs and snippets.
+
+*** Stage 2: URL Extraction
+
+The function extracts URLs from the API response. Currently, the API's content snippets are ignored in favor of fetching full page content, which provides much richer context.
+
+*** Stage 3: eww/shr Processing
+
+This is where the magic happens. Each URL is fetched and processed through Emacs' built-in =eww= and =shr= HTML rendering:
+
+#+begin_src elisp
+1. Fetch HTML with url-retrieve-synchronously
+2. Parse with libxml-parse-html-region
+3. Extract main content (looks for <article>, <main>, content divs)
+4. Render to clean plain text with shr-insert-document
+5. Escape org-mode special characters (* and # at line starts)
+#+end_src
+
+The =shr= (Simple HTML Renderer) library does an excellent job of converting HTML to readable plain text, stripping ads, navigation, and other noise.
+
+*** Stage 4: Context Attachment
+
+The cleaned text is formatted with org headings showing the source URL and attached to your conversation context:
+
+#+begin_example
+*** Web Search Results for: emacs 30 new features
+
+**** Result from: https://www.emacswiki.org/emacs/News
+
+[Clean, readable content...]
+
+**** Result from: https://github.com/emacs-mirror/emacs/blob/master/etc/NEWS
+
+[More clean content...]
+#+end_example
+
+*** Stage 5: LLM Submission
+
+When you send your next prompt, the search results are automatically included in the context. The LLM can now reason about current information as if it had this knowledge all along.
+
+** Usage: Three Ways to Search
+
+*** Inline Search Syntax
+
+The most elegant approach is inline =@search()= syntax in your prompts:
+
+#+begin_example
+What are the key improvements in @search(Emacs 30 new features)?
+
+Compare @search(Rust async programming) with @search(Go concurrency model)
+#+end_example
+
+ollama-buddy automatically detects these markers, executes the searches, attaches the results, and then sends your prompt. Multiple searches in one prompt work perfectly.
+
+*** Manual Search and Attach
+
+Use =C-c / a= (or =M-x ollama-buddy-web-search-attach=):
+
+#+begin_example
+C-c / a
+Search query: latest Rust features
+#+end_example
+
+The search executes, results are attached to your session, and the =🔍1= indicator appears in the header line.
+
+*** Search and Display
+
+Use =C-c / s= (or =M-x ollama-buddy-web-search=) to search and view results in a dedicated buffer before deciding whether to attach them:
+
+#+begin_example
+C-c / s
+Search query: Python 3.12 new features
+#+end_example
+
+A =*Web Search Results*= buffer opens showing the fetched content in org-mode format with folding. Review it, then manually attach if desired.
+
+** Configuration
+
+First, get an API key from https://ollama.com/settings/keys (it's free). Then configure:
+
+#+begin_src elisp
+(use-package ollama-buddy
+  :bind
+  ("C-c o" . ollama-buddy-role-transient-menu)
+  ("C-c O" . ollama-buddy-transient-menu-wrapper)
+  :custom
+  ;; Required: Your Ollama web search API key
+  (ollama-buddy-web-search-api-key "your-api-key-here")
+  
+  ;; Optional: Tune search behavior
+  (ollama-buddy-web-search-max-results 5)        ;; Number of URLs to fetch
+  (ollama-buddy-web-search-snippet-length 2000)  ;; Max chars per result
+  (ollama-buddy-web-search-include-urls nil)     ;; Include URLs in context
+  (ollama-buddy-web-search-content-source 'eww)  ;; Use eww for content
+  
+  :config
+  (require 'ollama-buddy-web-search nil t))
+#+end_src
+
+** Content Source Options
+
+The =ollama-buddy-web-search-content-source= variable controls how content is retrieved:
+
+*** =eww= (default, recommended)
+
+Fetches each URL and renders HTML through Emacs' eww/shr. Produces cleaner, more complete content but requires additional HTTP requests.
+
+Pros:
+- Much cleaner text extraction
+- Full page content, not just snippets
+- Removes ads, navigation, clutter
+- Works with any website
+
+Cons:
+- Slightly slower (additional HTTP requests)
+- Requires network access for each URL
+
+*** =api= (experimental)
+
+Uses content returned directly from the Ollama API without fetching individual URLs. Faster but content quality depends on what the API provides.
+
+Pros:
+- Faster (single API call)
+- Less network traffic
+
+Cons:
+- Content may be truncated
+- Quality varies by source
+- May miss important context
+
+I strongly recommend sticking with =eww= - the quality difference is substantial.
+
+** Real-World Examples
+
+*** Current Events
+
+#+begin_example
+Summarize the main points from @search(latest Linux kernel release notes)
+#+end_example
+
+The LLM fetches current kernel documentation and provides an up-to-date summary.
+
+*** Documentation Lookup
+
+#+begin_example
+How do I use @search(React useEffect hook) in a TypeScript project?
+#+end_example
+
+Fetches the latest React documentation and generates current, accurate examples.
+
+*** Comparative Research
+
+#+begin_example
+Compare the approaches in @search(Rust error handling) and @search(Go error handling)
+#+end_example
+
+Fetches documentation for both languages and provides a detailed comparison.
+
+*** Verification
+
+#+begin_example
+Is this information correct? @search(Emacs 29 release date)
+#+end_example
+
+Fetches authoritative sources to verify claims.
+
+** Managing Web Search Attachments
+
+Web searches integrate with the existing attachment system:
+
+- =C-c C-w= - Show all attachments (files and web searches)
+- =C-c 0= - Clear all attachments including web searches
+- Header line =🔍N= indicator shows count
+
+The attachment viewer displays full search result content with org-mode folding, so you can review exactly what context your LLM has access to.
+
+## Provider Compatibility
+
+Web search works with all LLM providers:
+
+- Local Ollama models (=o:= prefix)
+- OpenAI (=a:= prefix)
+- Anthropic Claude (=c:= prefix)
+- Google Gemini (=g:= prefix)
+- X Grok (=k:= prefix)
+- GitHub Copilot (=p:= prefix)
+- Mistral Codestral (=s:= prefix)
+
+The search results are just text in the context, so any provider that accepts context can use them.
+
+** Performance and Limits
+
+By default, web search fetches up to 5 URLs with 2000 characters per result. This provides rich context without overwhelming the LLM's context window.
+
+For longer research sessions, you can adjust:
+
+#+begin_src elisp
+(setq ollama-buddy-web-search-max-results 10)      ;; More sources
+(setq ollama-buddy-web-search-snippet-length 5000) ;; Longer excerpts
+#+end_src
+
+Be mindful of your LLM's context window limits. With 5 results at 2000 chars each, you're adding ~10K characters to your context.
+
+** Privacy Considerations
+
+Web search requires sending your search queries to Ollama's API. The fetched content is processed entirely locally through eww/shr. If privacy is a concern:
+
+1. Review search results before attaching (=C-c / s=)
+2. Manually curate which results to include
+3. Consider hosting your own search API (future enhancement)
+
+Your prompts and LLM conversations remain local - only the search queries and fetched web pages touch external servers.
+
+** Keybindings Summary
+
+In the chat buffer:
+
+| Key | Command | Description |
+|-----|---------|-------------|
+| =C-c / s= | =ollama-buddy-web-search= | Search and display results |
+| =C-c / a= | =ollama-buddy-web-search-attach= | Search and attach to context |
+| =C-c 0= | Clear attachments | Remove all files and searches |
+| =C-c C-w= | Show attachments | View attached files and searches |
+
+Or use the transient menu: =C-c O /= opens the web search submenu.
+
+** Future Enhancements
+
+Planned improvements for web search:
+
+- Local search API option (run your own searxng instance)
+- Search result ranking and filtering
+- Automatic relevance scoring
+- Cache frequently searched topics
+- Integration with org-roam for persistent knowledge
+
+The web search integration fundamentally expands what your local LLMs can do. They're no longer limited to their training data - they can reach out, fetch current information, and reason about it just like they would with any other context.
+
+Give it a try next time you need to ask your LLM about something recent or time-sensitive!
+
 * DONE Automatically Syncing Emacs Tab Bar Styling With Your Theme :emacs:2026:
 :PROPERTIES:
 :EXPORT_FILE_NAME: 20260211182648-emacs--Automatically-Syncing-Emacs-Tab-Bar-Styling-With-Your-Theme
