@@ -98,6 +98,8 @@ category = "categories"
 visibility = false
 
 [markup]
+[markup.highlight]
+style = "monokai"
 [markup.goldmark]
 [markup.goldmark.renderer]
 hardWraps = false
