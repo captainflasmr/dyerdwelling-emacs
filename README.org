@@ -1309,15 +1309,15 @@ One powerful workflow is switching providers within a single conversation:
 [Using o:llama3.2]
 You: Write a function to parse JSON
 
-* TODO Web Search Integration in ollama-buddy: Bringing Context to Your AI Conversations :ollama_buddy:ollama:emacs:2026:
+* DONE Ollama Buddy - Web Search Integration :ollama_buddy:ollama:emacs:2026:
 :PROPERTIES:
 :EXPORT_FILE_NAME: 20260212142000-emacs--Web-Search-Integration-in-ollama-buddy
 :EXPORT_HUGO_SECTION: emacs
-:EXPORT_HUGO_LASTMOD: <2026-02-12 14:20>
+:EXPORT_HUGO_LASTMOD: <2026-03-04 Wed 09:34>
 :EXPORT_HUGO_CUSTOM_FRONT_MATTER+: :thumbnail /emacs/20250424085731-emacs--Ollama-Buddy-0-9-35-Grok-Gemini-Integration-Enhanced-Sessions.jpg
 :END:
 
-One of the fundamental limitations of local LLMs is their knowledge cutoff - they don't know about anything that happened after their training data ended. The new web search integration in [[https://github.com/captainflasmr/ollama-buddy][ollama-buddy]] v1.3.0 solves this elegantly by fetching current information from the web and injecting it into your conversation context.
+One of the fundamental limitations of local LLMs is their knowledge cutoff - they don't know about anything that happened after their training data ended. The new web search integration in [[https://github.com/captainflasmr/ollama-buddy][ollama-buddy]] solves this by fetching current information from the web and injecting it into your conversation context.  Ollama has a specific API web search section, so it has now been activated!
 
 #+hugo: more
 
@@ -1325,114 +1325,44 @@ One of the fundamental limitations of local LLMs is their knowledge cutoff - the
 #+attr_html: :width 100%
 [[file:static/emacs/20250424085731-emacs--Ollama-Buddy-0-9-35-Grok-Gemini-Integration-Enhanced-Sessions.jpg]]
 
-** The Knowledge Gap Problem
+The web search feature implements a multi-stage pipeline that transforms search queries into clean, LLM-friendly context, your search query is sent to Ollama's Web Search API, the API returns structured search results with URLs and snippets.
 
-Your local Llama model is brilliant at reasoning, coding, and analysis. But ask it about:
+I have decided that each URL by default is fetched and processed through Emacs' built-in =eww= and =shr= HTML rendering, but this can of course be configured, set =ollama-buddy-web-search-content-source= to control how content is retrieved:
 
-- Current events ("What happened in the news today?")
-- Recent software releases ("What's new in Emacs 30?")
-- Up-to-date documentation ("How do I use the latest React hooks?")
-- Real-time information ("What's the current exchange rate?")
+- `eww' (default): Fetch each URL and render through eww/shr for clean text
+- `api': Use content returned directly from Ollama API (faster, less refined)
 
-...and you'll get either an honest "I don't know" or worse, confidently incorrect information based on outdated training data.
+The =shr= (Simple HTML Renderer) library does an excellent job of converting HTML to readable plain text, stripping ads, navigation, and other noise, so I thought why not just use this rather than the return results from the ollama API, as they didn't seem to be particularly accurate.
 
-Web search integration solves this by letting your LLM access current information while maintaining the privacy and control benefits of local inference.
+The cleaned text is formatted with org headings showing the source URL and attached to your conversation context, so when you send your next prompt, the search results are automatically included in the context. The LLM can now reason about current information as if it had this knowledge all along.
 
-** How It Works: The Pipeline
+There are multiple ways to search; firstly, is inline =@search()= syntax in your prompts (gradually expanding the inline prompting language!), so for example:
 
-The web search feature implements a multi-stage pipeline that transforms search queries into clean, LLM-friendly context:
-
-*** Stage 1: Query to Ollama API
-
-Your search query is sent to Ollama's Web Search API:
-
-#+begin_src elisp
-POST https://ollama.com/api/web_search
-Authorization: Bearer YOUR_API_KEY
-Content-Type: application/json
-
-{"query": "Emacs 30 new features"}
-#+end_src
-
-The API returns structured search results with URLs and snippets.
-
-*** Stage 2: URL Extraction
-
-The function extracts URLs from the API response. Currently, the API's content snippets are ignored in favor of fetching full page content, which provides much richer context.
-
-*** Stage 3: eww/shr Processing
-
-This is where the magic happens. Each URL is fetched and processed through Emacs' built-in =eww= and =shr= HTML rendering:
-
-#+begin_src elisp
-1. Fetch HTML with url-retrieve-synchronously
-2. Parse with libxml-parse-html-region
-3. Extract main content (looks for <article>, <main>, content divs)
-4. Render to clean plain text with shr-insert-document
-5. Escape org-mode special characters (* and # at line starts)
-#+end_src
-
-The =shr= (Simple HTML Renderer) library does an excellent job of converting HTML to readable plain text, stripping ads, navigation, and other noise.
-
-*** Stage 4: Context Attachment
-
-The cleaned text is formatted with org headings showing the source URL and attached to your conversation context:
-
-#+begin_example
-*** Web Search Results for: emacs 30 new features
-
-**** Result from: https://www.emacswiki.org/emacs/News
-
-[Clean, readable content...]
-
-**** Result from: https://github.com/emacs-mirror/emacs/blob/master/etc/NEWS
-
-[More clean content...]
-#+end_example
-
-*** Stage 5: LLM Submission
-
-When you send your next prompt, the search results are automatically included in the context. The LLM can now reason about current information as if it had this knowledge all along.
-
-** Usage: Three Ways to Search
-
-*** Inline Search Syntax
-
-The most elegant approach is inline =@search()= syntax in your prompts:
-
-#+begin_example
-What are the key improvements in @search(Emacs 30 new features)?
+#+begin_src
+What are the key improvements in @search(Emacs 31 new features)?
 
 Compare @search(Rust async programming) with @search(Go concurrency model)
-#+end_example
+#+end_src
 
-ollama-buddy automatically detects these markers, executes the searches, attaches the results, and then sends your prompt. Multiple searches in one prompt work perfectly.
+ollama-buddy automatically detects these markers, executes the searches, attaches the results, and then sends your prompt, so you can carry out multiple searches.
 
-*** Manual Search and Attach
+You can also manual Search and Attach, Use =C-c / a= (or =M-x ollama-buddy-web-search-attach=)
 
-Use =C-c / a= (or =M-x ollama-buddy-web-search-attach=):
-
-#+begin_example
-C-c / a
-Search query: latest Rust features
-#+end_example
-
-The search executes, results are attached to your session, and the =🔍1= indicator appears in the header line.
-
-*** Search and Display
-
-Use =C-c / s= (or =M-x ollama-buddy-web-search=) to search and view results in a dedicated buffer before deciding whether to attach them:
+The search executes, results are attached to your session, and the =♁1= indicator appears in the header line and the results can be viewed from the attachments menu, so for example would display something like:
 
 #+begin_example
-C-c / s
-Search query: Python 3.12 new features
+,* Web Searches (1)
+,** latest Emacs 31 features
+,*** 1. Hide Minor Modes in the Modeline in Emacs 31
+,*** 2. New Window Commands For Emacs 31
+,*** 3. Latest version of Emacs (GNU Emacs FAQ)
+,*** 4. bug#74145: 31.0.50; Default lexical-binding to t
+,*** 5. New in Emacs 30 (GNU Emacs FAQ)
 #+end_example
 
-A =*Web Search Results*= buffer opens showing the fetched content in org-mode format with folding. Review it, then manually attach if desired.
+with each header foldable, containing the actual search results.
 
-** Configuration
-
-First, get an API key from https://ollama.com/settings/keys (it's free). Then configure:
+There is a little configuration required to go through the ollama API, first, get an API key from https://ollama.com/settings/keys (it's free). Then configure:
 
 #+begin_src elisp
 (use-package ollama-buddy
@@ -1441,23 +1371,14 @@ First, get an API key from https://ollama.com/settings/keys (it's free). Then co
   ("C-c O" . ollama-buddy-transient-menu-wrapper)
   :custom
   ;; Required: Your Ollama web search API key
-  (ollama-buddy-web-search-api-key "your-api-key-here")
-  
-  ;; Optional: Tune search behavior
-  (ollama-buddy-web-search-max-results 5)        ;; Number of URLs to fetch
-  (ollama-buddy-web-search-snippet-length 2000)  ;; Max chars per result
-  (ollama-buddy-web-search-include-urls nil)     ;; Include URLs in context
-  (ollama-buddy-web-search-content-source 'eww)  ;; Use eww for content
-  
-  :config
-  (require 'ollama-buddy-web-search nil t))
-#+end_src
+  (ollama-buddy-web-search-api-key "your-api-key-here"))
+ #+end_src
 
-** Content Source Options
+For clarification, the content source options are as follows:
 
 The =ollama-buddy-web-search-content-source= variable controls how content is retrieved:
 
-*** =eww= (default, recommended)
+*=eww= (default, recommended)*
 
 Fetches each URL and renders HTML through Emacs' eww/shr. Produces cleaner, more complete content but requires additional HTTP requests.
 
@@ -1471,7 +1392,7 @@ Cons:
 - Slightly slower (additional HTTP requests)
 - Requires network access for each URL
 
-*** =api= (experimental)
+*=api= (experimental)*
 
 Uses content returned directly from the Ollama API without fetching individual URLs. Faster but content quality depends on what the API provides.
 
@@ -1486,66 +1407,6 @@ Cons:
 
 I strongly recommend sticking with =eww= - the quality difference is substantial.
 
-** Real-World Examples
-
-*** Current Events
-
-#+begin_example
-Summarize the main points from @search(latest Linux kernel release notes)
-#+end_example
-
-The LLM fetches current kernel documentation and provides an up-to-date summary.
-
-*** Documentation Lookup
-
-#+begin_example
-How do I use @search(React useEffect hook) in a TypeScript project?
-#+end_example
-
-Fetches the latest React documentation and generates current, accurate examples.
-
-*** Comparative Research
-
-#+begin_example
-Compare the approaches in @search(Rust error handling) and @search(Go error handling)
-#+end_example
-
-Fetches documentation for both languages and provides a detailed comparison.
-
-*** Verification
-
-#+begin_example
-Is this information correct? @search(Emacs 29 release date)
-#+end_example
-
-Fetches authoritative sources to verify claims.
-
-** Managing Web Search Attachments
-
-Web searches integrate with the existing attachment system:
-
-- =C-c C-w= - Show all attachments (files and web searches)
-- =C-c 0= - Clear all attachments including web searches
-- Header line =🔍N= indicator shows count
-
-The attachment viewer displays full search result content with org-mode folding, so you can review exactly what context your LLM has access to.
-
-## Provider Compatibility
-
-Web search works with all LLM providers:
-
-- Local Ollama models (=o:= prefix)
-- OpenAI (=a:= prefix)
-- Anthropic Claude (=c:= prefix)
-- Google Gemini (=g:= prefix)
-- X Grok (=k:= prefix)
-- GitHub Copilot (=p:= prefix)
-- Mistral Codestral (=s:= prefix)
-
-The search results are just text in the context, so any provider that accepts context can use them.
-
-** Performance and Limits
-
 By default, web search fetches up to 5 URLs with 2000 characters per result. This provides rich context without overwhelming the LLM's context window.
 
 For longer research sessions, you can adjust:
@@ -1557,42 +1418,7 @@ For longer research sessions, you can adjust:
 
 Be mindful of your LLM's context window limits. With 5 results at 2000 chars each, you're adding ~10K characters to your context.
 
-** Privacy Considerations
-
-Web search requires sending your search queries to Ollama's API. The fetched content is processed entirely locally through eww/shr. If privacy is a concern:
-
-1. Review search results before attaching (=C-c / s=)
-2. Manually curate which results to include
-3. Consider hosting your own search API (future enhancement)
-
-Your prompts and LLM conversations remain local - only the search queries and fetched web pages touch external servers.
-
-** Keybindings Summary
-
-In the chat buffer:
-
-| Key | Command | Description |
-|-----|---------|-------------|
-| =C-c / s= | =ollama-buddy-web-search= | Search and display results |
-| =C-c / a= | =ollama-buddy-web-search-attach= | Search and attach to context |
-| =C-c 0= | Clear attachments | Remove all files and searches |
-| =C-c C-w= | Show attachments | View attached files and searches |
-
-Or use the transient menu: =C-c O /= opens the web search submenu.
-
-** Future Enhancements
-
-Planned improvements for web search:
-
-- Local search API option (run your own searxng instance)
-- Search result ranking and filtering
-- Automatic relevance scoring
-- Cache frequently searched topics
-- Integration with org-roam for persistent knowledge
-
-The web search integration fundamentally expands what your local LLMs can do. They're no longer limited to their training data - they can reach out, fetch current information, and reason about it just like they would with any other context.
-
-Give it a try next time you need to ask your LLM about something recent or time-sensitive!
+The web search integration fundamentally expands what your local LLMs can do. They're no longer limited to their training data - they can reach out, fetch current information, and reason about it just like they would with any other context, so hopefully this will now make =ollama-buddy= a little more useful
 
 * DONE Ollama Buddy v2.5 - RAG (Retrieval-Augmented Generation) Support :ollama_buddy:ollama:emacs:2026:
 :PROPERTIES:
