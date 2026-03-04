@@ -12,6 +12,10 @@ One of the fundamental limitations of local LLMs is their knowledge cutoff - the
 
 <!--more-->
 
+Here is a demonstration:
+
+<https://www.youtube.com/watch?v=05VzAajH404>
+
 {{< figure src="/emacs/20250424085731-emacs--Ollama-Buddy-0-9-35-Grok-Gemini-Integration-Enhanced-Sessions.jpg" width="100%" >}}
 
 The web search feature implements a multi-stage pipeline that transforms search queries into clean, LLM-friendly context, your search query is sent to Ollama's Web Search API, the API returns structured search results with URLs and snippets.
