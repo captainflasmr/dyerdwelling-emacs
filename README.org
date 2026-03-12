@@ -23,7 +23,9 @@ There is now an in-buffer replace feature in [[https://github.com/captainflasmr/
 
 #+attr_org: :width 300px
 #+attr_html: :width 100%
-[[file:content/emacs/ollama-buddy-logo.jpg]]
+#+attr_org: :width 300px
+#+attr_html: :width 100%
+[[file:static/emacs/ollama-buddy-logo.jpg]]
 
 The feature is tucked away in the transient menu. Here's the workflow:
 
