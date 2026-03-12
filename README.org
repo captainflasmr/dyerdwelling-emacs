@@ -27,6 +27,8 @@ There is now an in-buffer replace feature in [[https://github.com/captainflasmr/
 #+attr_html: :width 100%
 [[file:static/emacs/ollama-buddy-logo.jpg]]
 
+Here is how it works : https://www.youtube.com/watch?v=Po7Wqpk0sqY
+
 The feature is tucked away in the transient menu. Here's the workflow:
 
 1. Toggle it on via =C-c O= → Actions → =W=, or run =M-x ollama-buddy-toggle-in-buffer-replace=
