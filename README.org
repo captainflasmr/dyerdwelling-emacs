@@ -17,7 +17,7 @@
 :EXPORT_HUGO_CUSTOM_FRONT_MATTER+: :thumbnail /emacs/ollama-buddy-logo.jpg
 :END:
 
-There is now an in-buffer replace feature in [[https://github.com/captainflasmr/ollama-buddy][ollama-buddy]], so now an ollama response can work directly on your text, streaming the replacement in real-time, and giving you a simple accept/reject choice!, I have also added an smerge diff inline if desired to show the differences and give the user the ability to accept or reject.
+There is now an in-buffer replace feature in [[https://github.com/captainflasmr/ollama-buddy][ollama-buddy]], so now an ollama response can work directly on your text, streaming the replacement in real-time, and giving you a simple accept/reject choice!, I have also added an smerge diff inline if desired to show the differences and give the user the ability to accept or reject
 
 #+hugo: more
 
