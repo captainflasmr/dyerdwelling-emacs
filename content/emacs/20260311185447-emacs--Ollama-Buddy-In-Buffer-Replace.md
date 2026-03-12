@@ -8,11 +8,13 @@ draft: false
 thumbnail: "/emacs/ollama-buddy-logo.jpg"
 ---
 
-There is now an in-buffer replace feature in [ollama-buddy](https://github.com/captainflasmr/ollama-buddy), so now an ollama response can work directly on your text, streaming the replacement in real-time, and giving you a simple accept/reject choice!, I have also added an smerge diff inline if desired to show the differences and give the user the ability to accept or reject.
+There is now an in-buffer replace feature in [ollama-buddy](https://github.com/captainflasmr/ollama-buddy), so now an ollama response can work directly on your text, streaming the replacement in real-time, and giving you a simple accept/reject choice!, I have also added an smerge diff inline if desired to show the differences and give the user the ability to accept or reject
 
 <!--more-->
 
-{{< figure src="/ox-hugo/ollama-buddy-logo.jpg" width="100%" >}}
+{{< figure src="/emacs/ollama-buddy-logo.jpg" width="100%" >}}
+
+Here is how it works : <https://www.youtube.com/watch?v=Po7Wqpk0sqY>
 
 The feature is tucked away in the transient menu. Here's the workflow:
 
